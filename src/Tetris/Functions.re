@@ -154,3 +154,19 @@ let getStrokeIndexes = (grid) => {
 
 let getGridSliceForBlock = (posY, block, grid) =>
   Array.sub(grid, posY, Array.length(block));
+
+let removeFilledRows = (grid) => {
+  let indexes = getStrokeIndexes(grid);
+  let indexesCount = Array.length(indexes);
+
+  if (indexesCount == 0) {
+    grid
+  } else {
+    let hasIndex = i => Js.Array.includes(i, indexes);
+    let emptyRow = Array.make(Array.length(grid[0]), O);
+
+    let filteredGrid = grid |> Js.Array.filteri((_el, i) => !hasIndex(i));
+
+    filteredGrid |> Array.append(Array.make(indexesCount, emptyRow));
+  }
+};

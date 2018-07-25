@@ -133,4 +133,101 @@ let () =
         expect(result) |> toEqual(expected);
       });
     });
+
+    describe("removeFilledRows", () => {
+      test("must be ok (nothing to remove)", () => {
+
+        let grid = [|
+        [|O, O, O|],
+        [|X, O, X|],
+        [|X, O, X|],
+        [|X, X, O|],
+        [|X, O, X|],
+        |];
+
+        let expected = [|
+        [|O, O, O|],
+        [|X, O, X|],
+        [|X, O, X|],
+        [|X, X, O|],
+        [|X, O, X|],
+        |];
+
+        let result = removeFilledRows(grid);
+
+        expect(result) |> toEqual(expected);
+      });
+      test("must be ok", () => {
+
+        let grid = [|
+        [|O, O, O|],
+        [|X, O, X|],
+        [|X, X, X|],
+        [|O, X, O|],
+        [|X, X, X|],
+        |];
+
+        let expected = [|
+        [|O, O, O|],
+        [|O, O, O|],
+        [|O, O, O|],
+        [|X, O, X|],
+        [|O, X, O|],
+        |];
+
+        let result = removeFilledRows(grid);
+
+        expect(result) |> toEqual(expected);
+      });
+
+      test("must be ok", () => {
+
+        let grid = [|
+        [|O, O, O|],
+        [|X, O, X|],
+        [|X, X, X|],
+        [|X, X, X|],
+        [|X, X, X|],
+        |];
+
+        let expected = [|
+        [|O, O, O|],
+        [|O, O, O|],
+        [|O, O, O|],
+        [|O, O, O|],
+        [|X, O, X|],
+        |];
+
+
+        let result = removeFilledRows(grid);
+
+        expect(result) |> toEqual(expected);
+      });
+
+      test("must be ok", () => {
+
+        let grid = [|
+        [|X, O, X|],
+        [|X, X, X|],
+        [|X, X, X|],
+        [|X, X, X|],
+        [|X, X, X|],
+        [|X, O, X|],
+        |];
+
+        let expected = [|
+        [|O, O, O|],
+        [|O, O, O|],
+        [|O, O, O|],
+        [|O, O, O|],
+        [|X, O, X|],
+        [|X, O, X|],
+        |];
+
+
+        let result = removeFilledRows(grid);
+
+        expect(result) |> toEqual(expected);
+      });
+    });
   });
