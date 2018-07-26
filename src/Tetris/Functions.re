@@ -18,17 +18,18 @@ let emptyRow = Array.make(10, 0);
 let emptyGrid = Array.make(10, emptyRow);
 let block1 = [|[|0, 1, 0|], [|0, 1, 0|], [|1, 1, 1|]|];
 
-let mapElementsToArray = (position: int, elements: array('a), array: array('a)) => {
+let mapElementsToArray =
+    (position: int, elements: array('a), array: array('a)) => {
   let elementsCount = Array.length(elements);
-  array |> Array.mapi(
-    (i, elem) =>
-      if (i >= position && i < position + elementsCount) {
-        let newElem = elements[i - position];
-        newElem;
-      } else {
-        elem;
-      }
-  );
+  array
+  |> Array.mapi((i, elem) =>
+       if (i >= position && i < position + elementsCount) {
+         let newElem = elements[i - position];
+         newElem;
+       } else {
+         elem;
+       }
+     );
 };
 
 let mapBlockRowToGridRow = (position, blockRow, gridRow) =>
@@ -39,7 +40,8 @@ let mapBlockToGrid = (posX: int, posY: int, block, grid) => {
   grid
   |> Array.mapi((gridPosY, gridRow) =>
        if (gridPosY >= posY && gridPosY < posY + blockSize) {
-         let newRow = mapBlockRowToGridRow(posX, block[gridPosY - posY], gridRow);
+         let newRow =
+           mapBlockRowToGridRow(posX, block[gridPosY - posY], gridRow);
          newRow;
        } else {
          gridRow;
@@ -108,12 +110,13 @@ let canMapBlock = (posX, posY, block, grid) =>
 let mapBlockRowToGridRowImp = (posX, blockRow, gridRow) => {
   let newGridRow = Array.copy(gridRow);
 
-  blockRow |> Array.iteri((i, blockCell) => {
-    switch blockCell {
-    | O => ()
-    | X => newGridRow[posX + i] = blockCell
-    };
-  });
+  blockRow
+  |> Array.iteri((i, blockCell) =>
+       switch (blockCell) {
+       | O => ()
+       | X => newGridRow[posX + i] = blockCell
+       }
+     );
 
   newGridRow;
 };
@@ -121,31 +124,33 @@ let mapBlockRowToGridRowImp = (posX, blockRow, gridRow) => {
 let mapBlockToGridImp = (posX, posY, block, grid) => {
   let newGrid = Array.copy(grid);
 
-  block |> Array.iteri((i, blockRow) => {
-    let gridRowIndex = posY + i;
-    newGrid[gridRowIndex] = mapBlockRowToGridRowImp(posX, blockRow, grid[gridRowIndex])
-  });
+  block
+  |> Array.iteri((i, blockRow) => {
+       let gridRowIndex = posY + i;
+       newGrid[gridRowIndex] =
+         mapBlockRowToGridRowImp(posX, blockRow, grid[gridRowIndex]);
+     });
 
   newGrid;
 };
 
-let getStrokeIndexes = (grid) => {
-  let checkRow = gridRow => {
-    gridRow |> Array.fold_left((acc, elem) =>
-    switch (acc, elem) {
-    | (true, X) => true
-    | (_, _) => false
-    }, true);
-  };
+let getStrokeIndexes = grid => {
+  let checkRow = gridRow =>
+    gridRow
+    |> Array.fold_left(
+         (acc, elem) =>
+           switch (acc, elem) {
+           | (true, X) => true
+           | (_, _) => false
+           },
+         true,
+       );
 
   grid
   |> Js.Array.reducei(
        (acc, gridRow, i) => {
          let hasStroke = checkRow(gridRow);
-         switch hasStroke {
-         | true => [i, ...acc]
-         | false => acc
-         };
+         hasStroke ? [i, ...acc] : acc;
        },
        [],
      )
@@ -155,18 +160,18 @@ let getStrokeIndexes = (grid) => {
 let getGridSliceForBlock = (posY, block, grid) =>
   Array.sub(grid, posY, Array.length(block));
 
-let removeFilledRows = (grid) => {
+let removeFilledRows = grid => {
   let indexes = getStrokeIndexes(grid);
   let indexesCount = Array.length(indexes);
 
   if (indexesCount == 0) {
-    grid
+    grid;
   } else {
     let hasIndex = i => Js.Array.includes(i, indexes);
     let emptyRow = Array.make(Array.length(grid[0]), O);
 
-    let filteredGrid = grid |> Js.Array.filteri((_el, i) => !hasIndex(i));
+    let filteredGrid = grid |> Js.Array.filteri((_el, i) => ! hasIndex(i));
 
     filteredGrid |> Array.append(Array.make(indexesCount, emptyRow));
-  }
+  };
 };
