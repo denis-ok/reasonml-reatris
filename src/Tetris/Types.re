@@ -13,6 +13,12 @@ type blockPosition = {
   y: int,
 };
 
+type gridState = {
+  block,
+  blockPosition,
+  grid,
+};
+
 type blockSize = {
   width: int,
   height: int,

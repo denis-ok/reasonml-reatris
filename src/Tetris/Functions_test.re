@@ -65,13 +65,13 @@ let () =
 
     describe("canMapBlock", () => {
       test("Should return true", () => {
-        let result = canMapBlockTyped({ x: 0, y: 4 }, testBlock, testGrid);
+        let result = canMapBlock({ x: 0, y: 4 }, testBlock, testGrid);
 
         expect(result) |> toEqual(true);
       });
 
       test("Should return false", () => {
-        let result = canMapBlockTyped({x: 1, y: 4 }, testBlock, testGrid);
+        let result = canMapBlock({x: 1, y: 4 }, testBlock, testGrid);
 
         expect(result) |> toEqual(false);
       });
@@ -82,7 +82,7 @@ let () =
         let blockRow = [|X, X, X|];
         let gridRow = [|O, O, O, O, O, O, O, O, O, O|];
 
-        let result = mapBlockRowToGridRowImp(0, blockRow, gridRow);
+        let result = mapBlockRowToGridRow(0, blockRow, gridRow);
         let expected = [|X, X, X, O, O, O, O, O, O, O|];
 
         expect(result) |> toEqual(expected);
@@ -102,7 +102,7 @@ let () =
     describe("map block to grid", () => {
       test("map block imperative", () => {
 
-        let result = mapBlockToGridImp(0, 4, testBlock, testGrid);
+        let result = mapBlockToGrid({ x:0, y: 4 }, testBlock, testGrid);
         let expected =[|
         [|O, O, O, O, O, O|],
         [|O, O, O, O, O, O|],
