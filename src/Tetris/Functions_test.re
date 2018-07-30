@@ -1,6 +1,6 @@
 open Jest;
 open Expect;
-/* open Blocks; */
+open Types;
 open Functions;
 
 let testBlock = [|
@@ -65,13 +65,13 @@ let () =
 
     describe("canMapBlock", () => {
       test("Should return true", () => {
-        let result = canMapBlock(0, 4, testBlock, testGrid);
+        let result = canMapBlockTyped({ x: 0, y: 4 }, testBlock, testGrid);
 
         expect(result) |> toEqual(true);
       });
 
       test("Should return false", () => {
-        let result = canMapBlock(1, 4, testBlock, testGrid);
+        let result = canMapBlockTyped({x: 1, y: 4 }, testBlock, testGrid);
 
         expect(result) |> toEqual(false);
       });
@@ -226,6 +226,24 @@ let () =
 
 
         let result = removeFilledRows(grid);
+
+        expect(result) |> toEqual(expected);
+      });
+    });
+
+    describe("tick", () => {
+      test("must be 2", () => {
+
+        let result = getStrokeIndexes(testGridWithStrokes);
+        let expected =[|5, 3|];
+
+        expect(result) |> toEqual(expected);
+      });
+
+      test("must return empty array", () => {
+
+        let result = getStrokeIndexes(testGrid);
+        let expected =[||];
 
         expect(result) |> toEqual(expected);
       });

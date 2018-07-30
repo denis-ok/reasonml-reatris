@@ -5,6 +5,7 @@ type cell =
 type row = array(cell);
 
 type grid = array(row);
+
 type block = array(row);
 
 type blockPosition = {
