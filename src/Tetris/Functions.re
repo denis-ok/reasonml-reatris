@@ -1,51 +1,5 @@
 open Types;
 
-/* let mapElementsToArray =
-       (position: int, elements: array('a), array: array('a)) => {
-     let elementsCount = Array.length(elements);
-     array
-     |> Array.mapi((i, elem) =>
-          if (i >= position && i < position + elementsCount) {
-            let newElem = elements[i - position];
-            newElem;
-          } else {
-            elem;
-          }
-        );
-   };
-
-   let mapBlockRowToGridRow = (posX: int, blockRow: row, gridRow: row) =>
-     mapElementsToArray(posX, blockRow, gridRow);
-
-   let mapBlockToGrid = (posX: int, posY: int, block, grid) => {
-     let blockSize = Array.length(block);
-     grid
-     |> Array.mapi((gridPosY, gridRow) =>
-          if (gridPosY >= posY && gridPosY < posY + blockSize) {
-            let newRow =
-              mapBlockRowToGridRow(posX, block[gridPosY - posY], gridRow);
-            newRow;
-          } else {
-            gridRow;
-          }
-        );
-   }; */
-
-/* let getGridSliceForBlock = (posY: int, block : block, grid : grid) =>
-     Array.sub(grid, posY, Array.length(block));
-
-   let mapBlockToGridNew = (position: blockPosition, block: block, grid: grid) => {
-     let gridRowsForMap = getGridSliceForBlock(position.y, block, grid);
-
-     let mappedBlock =
-       block
-       |> Array.mapi((i, blockRow) =>
-            mapBlockRowToGridRow(position.x, blockRow, gridRowsForMap[i])
-          );
-
-     mapElementsToArray(position.y, mappedBlock, grid);
-   }; */
-
 let getWidth = (grid: grid) => Array.length(grid[0]);
 let getHeight = (grid: grid) => Array.length(grid);
 
@@ -82,8 +36,11 @@ let canMapRow = (posX: int, blockRow: row, gridRow: row) =>
        true,
      );
 
-let canMapBlock = (position: blockPosition, block: block, grid: grid) =>
-  block
+let canMapBlock = (position: blockPosition, block: block, grid: grid) => {
+  let isValidPos = isValidPosition(position, block, grid);
+
+  isValidPos
+  && block
   |> Js.Array.reducei(
        (acc, blockRow, i) =>
          switch (acc) {
@@ -94,6 +51,7 @@ let canMapBlock = (position: blockPosition, block: block, grid: grid) =>
          },
        true,
      );
+};
 
 let mapBlockRowToGridRow = (posX: int, blockRow: row, gridRow: row) => {
   let newGridRow = Array.copy(gridRow);
@@ -117,6 +75,19 @@ let mapBlockToGrid = (position: blockPosition, block: block, grid: grid) => {
        let gridRowIndex = position.y + i;
        newGrid[gridRowIndex] =
          mapBlockRowToGridRow(position.x, blockRow, grid[gridRowIndex]);
+     });
+
+  newGrid;
+};
+
+let mapBlockToGridOk = ({blockPosition, block, grid}: gridState) => {
+  let newGrid = Array.copy(grid);
+
+  block
+  |> Array.iteri((i, blockRow) => {
+       let gridRowIndex = blockPosition.y + i;
+       newGrid[gridRowIndex] =
+         mapBlockRowToGridRow(blockPosition.x, blockRow, grid[gridRowIndex]);
      });
 
   newGrid;
@@ -161,29 +132,17 @@ let removeFilledRows = (grid: grid) => {
   };
 };
 
-let getNextGridState = ({blockPosition, block, grid}: gridState) => {
-  let canMap = canMapBlock(blockPosition, block, grid);
-
-  if (canMap) {
-    let nextGrid = mapBlockToGrid(blockPosition, block, grid);
-    nextGrid;
-  } else {
-    grid;
-  };
-};
-
 let tick = ({blockPosition, block, grid}: gridState) => {
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
 
-  let isValidPos = isValidPosition(nextPosition, block, grid);
   let canMap = canMapBlock(nextPosition, block, grid);
 
-  if (isValidPos && canMap) {
+  if (canMap) {
     {block, blockPosition: nextPosition, grid};
   } else {
     let nextGrid =
-      mapBlockToGrid(blockPosition, block, grid) |> removeFilledRows;
+      mapBlockToGridOk({blockPosition, block, grid}) |> removeFilledRows;
     let nextState = {
       block,
       blockPosition: {

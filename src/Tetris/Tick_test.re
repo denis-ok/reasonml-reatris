@@ -26,7 +26,6 @@ let testGrid2 =[|
 [|X, X, X, O, O, O|],
 |];
 
-
 let testGrid3 =[|
 [|O, O, O, O, O, O|],
 [|O, O, O, O, O, O|],
@@ -34,6 +33,24 @@ let testGrid3 =[|
 [|O, X, X, X, O, O|],
 [|O, O, X, O, O, O|],
 [|X, O, X, X, X, X|],
+|];
+
+let testGrid4 =[|
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+|];
+
+let testGrid4After =[|
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|O, O, O, O, O, O|],
+[|X, X, X, O, O, O|],
+[|O, X, O, O, O, O|],
 |];
 
 
@@ -73,7 +90,7 @@ let () =
         expect(tick(stateBefore)) |> toEqual(expected);
       });
 
-      test("should return new state with next block", () => {
+      test("should return new state with next block 1", () => {
         let stateBefore = {
           block: testBlock,
           blockPosition: { x: 1, y: 3 },
@@ -84,6 +101,22 @@ let () =
           block: testBlock,
           blockPosition: { x: 0, y: 0 },
           grid: testGrid3
+        };
+
+        expect(tick(stateBefore)) |> toEqual(expected);
+      });
+
+      test("should return new state with next block 2", () => {
+        let stateBefore = {
+          block: testBlock,
+          blockPosition: { x: 0, y: 4 },
+          grid: testGrid4
+        };
+
+        let expected = {
+          block: testBlock,
+          blockPosition: { x: 0, y: 0 },
+          grid: testGrid4After
         };
 
         expect(tick(stateBefore)) |> toEqual(expected);
