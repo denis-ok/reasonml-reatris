@@ -14,12 +14,20 @@ type blockPosition = {
 };
 
 type gridState = {
-  block,
-  blockPosition,
-  grid,
+  block : block,
+  blockPosition: blockPosition,
+  grid: grid,
 };
 
 type blockSize = {
   width: int,
   height: int,
+};
+
+type gameOver = bool;
+
+type gameState = {
+  block,
+  gridState,
+  gameOver
 };
