@@ -154,3 +154,10 @@ let tick = ({blockPosition, block, grid}: gridState) => {
     nextState;
   };
 };
+
+let isGameOver = ({blockPosition, block, grid}: gridState) => {
+  let canMap = canMapBlock(blockPosition, block, grid);
+  let {y} = blockPosition;
+
+  y == 0 && !canMap;
+};

@@ -25,9 +25,11 @@ type blockSize = {
 };
 
 type gameOver = bool;
+type intervalId = option(Js.Global.intervalId);
 
 type gameState = {
   block,
   gridState,
-  gameOver
+  gameOver,
+  intervalId
 };
