@@ -159,5 +159,29 @@ let isGameOver = ({blockPosition, block, grid}: gridState) => {
   let canMap = canMapBlock(blockPosition, block, grid);
   let {y} = blockPosition;
 
-  y == 0 && !canMap;
+  y == 0 && ! canMap;
+};
+
+let getNextPositionByDirection = (direction, currentPosition) => {
+  let {x, y} = currentPosition;
+
+  let nextPosition =
+    switch (direction) {
+    | Left => {x: x - 1, y}
+    | Right => {x: x + 1, y}
+    | Down => {x, y: y + 1};
+    | _ => currentPosition
+    };
+
+  nextPosition;
+};
+
+let getGridStateAfterMove = (direction: direction, gridState) => {
+  let {blockPosition, block, grid} = gridState;
+
+  let nextPosition = getNextPositionByDirection(direction, blockPosition);
+
+  let canMap = canMapBlock(nextPosition, block, grid);
+
+  canMap ? {...gridState, blockPosition: nextPosition} : gridState;
 };

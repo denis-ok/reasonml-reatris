@@ -33,3 +33,5 @@ type gameState = {
   gameOver,
   intervalId
 };
+
+type direction = Left | Up | Right | Down | Unknown;
