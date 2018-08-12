@@ -185,3 +185,16 @@ let getGridStateAfterMove = (direction: direction, gridState) => {
 
   canMap ? {...gridState, blockPosition: nextPosition} : gridState;
 };
+
+
+let rotate2dArr = (arr : array(array('a))) => {
+  let initArr = arr[0];
+
+  let getColumn = (i, grid) => grid |> Array.map(row => row[i]);
+
+  initArr |> Array.mapi((i, _row) => getColumn(i, arr));
+};
+
+let reverseArr = Belt.Array.reverse;
+
+let rotateClockwise = grid => grid |> reverseArr |> rotate2dArr;
