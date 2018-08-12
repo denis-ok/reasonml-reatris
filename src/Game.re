@@ -28,7 +28,7 @@ type action =
   | MoveBlock(direction);
 
 let eventKeyCodeToDirection = (event) => {
-  let keyCode = ReactEventRe.Keyboard.keyCode(event);
+  let keyCode = ReactEvent.Keyboard.keyCode(event);
   let direction = switch keyCode {
   | 37 => Left
   | 38 => Up
