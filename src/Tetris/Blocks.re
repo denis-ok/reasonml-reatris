@@ -3,6 +3,9 @@ open Types;
 Random.init(int_of_float(Js.Date.now()));
 
 let getRandomElemIndex = arr => Random.int(Array.length(arr));
+let getRandomElemFromArr = arr => arr[getRandomElemIndex(arr)];
+
+let mirror = block => block |> Array.map(row => Belt.Array.reverse(row));
 
 let blockT =
 [|
@@ -34,6 +37,6 @@ let blockI =
 [|X, X, X, X|]
 |];
 
-let blockColl = [|blockT, blockBox, blockL, blockZ, blockI|];
+let blockColl = [|blockT, blockBox, blockI, blockL, mirror(blockL), blockZ, mirror(blockZ)|];
 
-let getRandomBlock = () => blockColl[getRandomElemIndex(blockColl)];
+let getRandomBlock = () => getRandomElemFromArr(blockColl);
