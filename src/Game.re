@@ -25,7 +25,8 @@ type state = gameState;
 type action =
   | SetIntervalId(Js.Global.intervalId)
   | Tick
-  | MoveBlock(direction);
+  | MoveBlock(direction)
+  | RotateBlock;
 
 let eventKeyCodeToDirection = (event) => {
   let keyCode = ReactEvent.Keyboard.keyCode(event);
@@ -39,6 +40,14 @@ let eventKeyCodeToDirection = (event) => {
 
   direction;
 };
+
+let directionToAction = direction =>
+  switch (direction) {
+  | Left
+  | Right
+  | Down => MoveBlock(direction)
+  | Up => RotateBlock
+  };
 
 let component = ReasonReact.reducerComponent("Game");
 
@@ -55,7 +64,11 @@ let make = _children => {
     | SetIntervalId(id) =>
       ReasonReact.Update({...state, intervalId: Some(id)})
 
-    | MoveBlock(direction) => ReasonReact.Update({...state, gridState: Functions.getGridStateAfterMove(direction, state.gridState)});
+    | MoveBlock(direction) =>
+      ReasonReact.Update({...state, gridState: Functions.getGridStateAfterMove(direction, state.gridState)});
+
+    | RotateBlock =>
+      ReasonReact.Update({...state, gridState: Functions.getGridStateAfterRotate(state.gridState)});
 
     | Tick =>
       let nextGridState = Functions.tick(state.gridState);
@@ -77,7 +90,7 @@ let make = _children => {
     let gridToRender = Functions.mapBlockToGridOk(self.state.gridState);
     <div className="Game">
       <input
-      onKeyDown=(event => self.send(MoveBlock(eventKeyCodeToDirection(event))))
+      onKeyDown=(event => self.send(eventKeyCodeToDirection(event) |> directionToAction))
       autoFocus=true
       />
       <Grid grid=gridToRender />

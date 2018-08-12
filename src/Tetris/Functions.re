@@ -176,6 +176,7 @@ let getNextPositionByDirection = (direction, currentPosition) => {
   nextPosition;
 };
 
+
 let getGridStateAfterMove = (direction: direction, gridState) => {
   let {blockPosition, block, grid} = gridState;
 
@@ -198,3 +199,12 @@ let rotate2dArr = (arr : array(array('a))) => {
 let reverseArr = Belt.Array.reverse;
 
 let rotateClockwise = grid => grid |> reverseArr |> rotate2dArr;
+
+let getGridStateAfterRotate = (gridState) => {
+  let {blockPosition, block, grid} = gridState;
+  let rotatedBlock = rotateClockwise(block);
+
+  let canMap = canMapBlock(blockPosition, rotatedBlock, grid);
+
+  canMap ? {...gridState, block: rotatedBlock} : gridState;
+};
