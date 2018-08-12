@@ -1,5 +1,4 @@
 open Types;
-open Blocks;
 
 let initBlockPosition = {x: 0, y: 0};
 
@@ -8,13 +7,12 @@ let emptyRow = Array.make(10, O);
 let emptyGrid = Array.make(20, emptyRow);
 
 let initGridState = {
-  block: blockT,
+  block: Blocks.getRandomBlock(),
   blockPosition: initBlockPosition,
   grid: emptyGrid,
 };
 
 let initGameState = {
-  block: blockT,
   gridState: initGridState,
   gameOver: false,
   intervalId: None,

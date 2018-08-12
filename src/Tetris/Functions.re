@@ -144,7 +144,7 @@ let tick = ({blockPosition, block, grid}: gridState) => {
     let nextGrid =
       mapBlockToGridOk({blockPosition, block, grid}) |> removeFilledRows;
     let nextState = {
-      block,
+      block: Blocks.getRandomBlock(),
       blockPosition: {
         x: 0,
         y: 0,
