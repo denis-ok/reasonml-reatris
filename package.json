@@ -1,21 +1,35 @@
 {
-  "name": "reasonml-tetris",
+  "name": "my-first-app",
   "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "reason-scripts": "0.9.0"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "prepare": "npm link bs-platform"
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
+    "webpack": "webpack",
+    "webpack-dev-server": "webpack-dev-server",
+    "webpack-serve": "webpack-serve",
+    "jest": "jest"
   },
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "reason-react": "^0.4.2"
+    "bs-platform": "^4.0.3",
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^1.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.22.1",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5",
+    "webpack-serve": "^2.0.2"
+  },
+  "dependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "reason-react": "^0.5.3"
   }
 }
