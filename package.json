@@ -1,5 +1,5 @@
 {
-  "name": "my-first-app",
+  "name": "reatris",
   "version": "0.1.0",
   "scripts": {
     "build": "bsb -make-world",
@@ -13,11 +13,11 @@
   "keywords": [
     "BuckleScript"
   ],
-  "author": "",
+  "author": "Denis Strelkov",
   "license": "MIT",
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.4.2",
-    "bs-platform": "^4.0.3",
+    "@glennsl/bs-jest": "^0.4.3",
+    "bs-platform": "^4.0.5",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "html-webpack-plugin": "^3.2.0",
@@ -28,6 +28,7 @@
     "webpack-serve": "^2.0.2"
   },
   "dependencies": {
+    "bs-webapi": "^0.11.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "reason-react": "^0.5.3"

@@ -1,5 +1,5 @@
 {
-  "name": "my-reason-boilerplate",
+  "name": "Reatris",
   "reason": {
     "react-jsx": 2
   },
@@ -13,7 +13,8 @@
     "in-source": true
   },
   "bs-dependencies": [
-    "reason-react"
+    "reason-react",
+    "bs-webapi"
   ],
   "bs-dev-dependencies": [
     "@glennsl/bs-jest"
