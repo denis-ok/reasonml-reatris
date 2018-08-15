@@ -1,5 +1,7 @@
 open Types;
 
+[@bs.val] external document : Dom.document = "document";
+
 let initBlockPosition = {x: 0, y: 0};
 
 let emptyRow = Array.make(10, O);
@@ -24,37 +26,37 @@ type action =
   | SetIntervalId(Js.Global.intervalId)
   | Tick
   | MoveBlock(direction)
-  | RotateBlock;
+  | RotateBlock
+  | NoAction;
 
-let eventKeyCodeToDirection = (event) => {
-  let keyCode = ReactEvent.Keyboard.keyCode(event);
-  let direction = switch keyCode {
-  | 37 => Left
-  | 38 => Up
-  | 39 => Right
-  | 40 => Down
-  | _ => Unknown
+let keyToAction = (event) => {
+  let key = event |> Webapi.Dom.KeyboardEvent.key;
+  let direction = switch key {
+  | "ArrowLeft" => MoveBlock(Left)
+  | "ArrowRight" => MoveBlock(Right)
+  | "ArrowDown" => MoveBlock(Down)
+  | "ArrowUp" => RotateBlock
+  | _ => NoAction;
   };
 
   direction;
 };
 
-let directionToAction = direction =>
-  switch (direction) {
-  | Left
-  | Right
-  | Down => MoveBlock(direction)
-  | Up => RotateBlock
-  };
+let keyHandler = (evt, self) => self.ReasonReact.send(keyToAction(evt));
+
+let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
 
 let component = ReasonReact.reducerComponent("Game");
 
 let make = _children => {
   ...component,
   initialState: () => initGameState,
+
   didMount: self => {
     let intervalId = Js.Global.setInterval(() => self.send(Tick), 200);
     self.send(SetIntervalId(intervalId));
+
+    addKeyDownEventListener(self.handle(keyHandler), document);
   },
 
   reducer: (action, state) =>
@@ -87,10 +89,6 @@ let make = _children => {
   render: self => {
     let gridToRender = Functions.mapBlockToGridOk(self.state.gridState);
     <div className="Game">
-      <input
-      onKeyDown=(event => self.send(eventKeyCodeToDirection(event) |> directionToAction))
-      autoFocus=true
-      />
       <Grid grid=gridToRender />
     </div>;
   },
