@@ -37,7 +37,7 @@ let make = (~grid: grid, _children) => {
   render: _self =>
     <div className="Grid-container">
       <div className="Grid">
-        (grid |> Array.mapi((i, row) => <Row key=string_of_int(i) row />) |> ReasonReact.array)
+        (grid |> Array.mapi((i, row) => i > 1 ? <Row key=string_of_int(i) row /> : ReasonReact.null) |> ReasonReact.array)
       </div>
     </div>,
 };

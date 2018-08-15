@@ -132,6 +132,18 @@ let removeFilledRows = (grid: grid) => {
   };
 };
 
+let genInitBlockPosition = (block: block, grid: grid) : blockPosition => {
+  let blockWidth = getWidth(block);
+  let blockHeight = getHeight(block);
+  let gridWidth = getWidth(grid);
+
+  let posX = Random.int(gridWidth - blockWidth);
+  let posY = 3 - blockHeight;
+
+  let position = {x: posX, y: posY};
+  position;
+};
+
 let tick = ({blockPosition, block, grid}: gridState) => {
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
@@ -143,12 +155,12 @@ let tick = ({blockPosition, block, grid}: gridState) => {
   } else {
     let nextGrid =
       mapBlockToGridOk({blockPosition, block, grid}) |> removeFilledRows;
+
+    let nextBlock = Blocks.getRandomBlock();
+
     let nextState = {
-      block: Blocks.getRandomBlock(),
-      blockPosition: {
-        x: 0,
-        y: 0,
-      },
+      block: nextBlock,
+      blockPosition: genInitBlockPosition(nextBlock, grid),
       grid: nextGrid,
     };
     nextState;
@@ -158,8 +170,9 @@ let tick = ({blockPosition, block, grid}: gridState) => {
 let isGameOver = ({blockPosition, block, grid}: gridState) => {
   let canMap = canMapBlock(blockPosition, block, grid);
   let {y} = blockPosition;
+  let blockHeight = getHeight(block);
 
-  y == 0 && ! canMap;
+  y == (3 - blockHeight) && ! canMap;
 };
 
 let getNextPositionByDirection = (direction, currentPosition) => {
@@ -169,13 +182,12 @@ let getNextPositionByDirection = (direction, currentPosition) => {
     switch (direction) {
     | Left => {x: x - 1, y}
     | Right => {x: x + 1, y}
-    | Down => {x, y: y + 1};
+    | Down => {x, y: y + 1}
     | _ => currentPosition
     };
 
   nextPosition;
 };
-
 
 let getGridStateAfterMove = (direction: direction, gridState) => {
   let {blockPosition, block, grid} = gridState;
@@ -187,8 +199,7 @@ let getGridStateAfterMove = (direction: direction, gridState) => {
   canMap ? {...gridState, blockPosition: nextPosition} : gridState;
 };
 
-
-let rotate2dArr = (arr : array(array('a))) => {
+let rotate2dArr = (arr: array(array('a))) => {
   let initArr = arr[0];
 
   let getColumn = (i, grid) => grid |> Array.map(row => row[i]);
@@ -200,7 +211,7 @@ let reverseArr = Belt.Array.reverse;
 
 let rotateClockwise = grid => grid |> reverseArr |> rotate2dArr;
 
-let getGridStateAfterRotate = (gridState) => {
+let getGridStateAfterRotate = gridState => {
   let {blockPosition, block, grid} = gridState;
   let rotatedBlock = rotateClockwise(block);
 

@@ -2,14 +2,16 @@ open Types;
 
 [@bs.val] external document : Dom.document = "document";
 
-let initBlockPosition = {x: 0, y: 0};
-
 let emptyRow = Array.make(10, O);
 
-let emptyGrid = Array.make(20, emptyRow);
+let emptyGrid = Array.make(22, emptyRow);
+
+let firstBlock = Blocks.getRandomBlock();
+
+let initBlockPosition = Functions.genInitBlockPosition(firstBlock, emptyGrid);
 
 let initGridState = {
-  block: Blocks.getRandomBlock(),
+  block: firstBlock,
   blockPosition: initBlockPosition,
   grid: emptyGrid,
 };
@@ -49,7 +51,7 @@ let make = _children => {
   initialState: () => initGameState,
 
   didMount: self => {
-    let intervalId = Js.Global.setInterval(() => self.send(Tick), 200);
+    let intervalId = Js.Global.setInterval(() => self.send(Tick), 500);
     self.send(SetIntervalId(intervalId));
 
     addKeyDownEventListener(self.handle(keyToAction), document);
