@@ -26,23 +26,19 @@ type action =
   | SetIntervalId(Js.Global.intervalId)
   | Tick
   | MoveBlock(direction)
-  | RotateBlock
-  | NoAction;
+  | RotateBlock;
 
-let keyToAction = (event) => {
+let keyToAction = (event, self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
-  let direction = switch key {
-  | "ArrowLeft" => MoveBlock(Left)
-  | "ArrowRight" => MoveBlock(Right)
-  | "ArrowDown" => MoveBlock(Down)
-  | "ArrowUp" => RotateBlock
-  | _ => NoAction;
+
+  switch (key) {
+  | "ArrowLeft" => self.ReasonReact.send(MoveBlock(Left))
+  | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
+  | "ArrowDown" => self.ReasonReact.send(MoveBlock(Down))
+  | "ArrowUp" => self.ReasonReact.send(RotateBlock)
+  | _ => ()
   };
-
-  direction;
 };
-
-let keyHandler = (evt, self) => self.ReasonReact.send(keyToAction(evt));
 
 let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
 
@@ -56,7 +52,7 @@ let make = _children => {
     let intervalId = Js.Global.setInterval(() => self.send(Tick), 200);
     self.send(SetIntervalId(intervalId));
 
-    addKeyDownEventListener(self.handle(keyHandler), document);
+    addKeyDownEventListener(self.handle(keyToAction), document);
   },
 
   reducer: (action, state) =>
