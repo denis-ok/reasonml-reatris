@@ -5,34 +5,34 @@ Random.init(int_of_float(Js.Date.now()));
 let getRandomElemIndex = arr => Random.int(Array.length(arr));
 let getRandomElemFromArr = arr => arr[getRandomElemIndex(arr)];
 
-let mirror = block => block |> Array.map(row => Belt.Array.reverse(row));
+let mirror = block  => block |> Array.map(row => Belt.Array.reverse(row));
 
-let blockT =
+let blockT : block =
 [|
 [|X, X, X|],
 [|O, X, O|],
 |];
 
-let blockBox =
+let blockBox : block =
 [|
 [|X, X|],
 [|X, X|],
 |];
 
-let blockL =
+let blockL : block =
 [|
 [|X, O|],
 [|X, O|],
 [|X, X|],
 |];
 
-let blockZ =
+let blockZ : block =
 [|
 [|O, X, X|],
 [|X, X, O|],
 |];
 
-let blockI =
+let blockI : block =
 [|
 [|X, X, X, X|]
 |];

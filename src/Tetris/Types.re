@@ -24,11 +24,13 @@ type blockSize = {
   height: int,
 };
 
+type nextBlock = block;
 type gameOver = bool;
 type intervalId = option(Js.Global.intervalId);
 
 type gameState = {
   gridState,
+  nextBlock,
   gameOver,
   intervalId
 };

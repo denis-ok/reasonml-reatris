@@ -30,14 +30,31 @@ module Row = {
   };
 };
 
-let component = ReasonReact.statelessComponent("Grid");
+module NextBlockArea = {
+  let component = ReasonReact.statelessComponent("NextBlockArea");
 
-let make = (~grid: grid, _children) => {
-  ...component,
-  render: _self =>
-    <div className="Grid-container">
-      <div className="Grid">
-        (grid |> Array.mapi((i, row) => i > 1 ? <Row key=string_of_int(i) row /> : ReasonReact.null) |> ReasonReact.array)
-      </div>
-    </div>,
+  let make = (~grid: grid, _children) => {
+    ...component,
+    render: _self =>
+      <div className="NextBlock-container Container">
+        <div className="NextBlock">
+          (grid |> Array.mapi((i, row) => <Row key=string_of_int(i) row />) |> ReasonReact.array)
+        </div>
+      </div>,
+  };
+};
+
+
+module GameArea = {
+  let component = ReasonReact.statelessComponent("Grid");
+
+  let make = (~grid: grid, _children) => {
+    ...component,
+    render: _self =>
+      <div className="Grid-container Container">
+        <div className="Grid">
+          (grid |> Array.mapi((i, row) => i > 1 ? <Row key=string_of_int(i) row /> : ReasonReact.null) |> ReasonReact.array)
+        </div>
+      </div>,
+  };
 };

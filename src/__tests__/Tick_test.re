@@ -71,7 +71,7 @@ let () =
           grid: testGrid1
         };
 
-        expect(tick(stateBefore)) |> toEqual(expected);
+        expect(tick(stateBefore, testBlock)) |> toEqual(expected);
       });
 
       /* test("should return new state after strike", () => {

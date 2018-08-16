@@ -16,8 +16,9 @@ let initGridState = {
   grid: emptyGrid,
 };
 
-let initGameState = {
+let initGameState : gameState = {
   gridState: initGridState,
+  nextBlock: Blocks.getRandomBlock(),
   gameOver: false,
   intervalId: None,
 };
@@ -69,25 +70,38 @@ let make = _children => {
       ReasonReact.Update({...state, gridState: Functions.getGridStateAfterRotate(state.gridState)});
 
     | Tick =>
-      let nextGridState = Functions.tick(state.gridState);
+      let nextGridState = Functions.tick(state.gridState, state.nextBlock);
+
+      let nextBlock = {
+        if (nextGridState.block === state.nextBlock) {
+          Blocks.getRandomBlock()
+        } else {
+          state.nextBlock
+        }
+      };
+
       let gameOver = Functions.isGameOver(nextGridState);
 
       switch (gameOver) {
-      | false => ReasonReact.Update({...state, gridState: nextGridState})
+      | false => ReasonReact.Update({...state, gridState: nextGridState, nextBlock: nextBlock})
       | true =>
         Js.log("Game over!");
         switch (state.intervalId) {
         | Some(id) => Js.Global.clearInterval(id)
         | None => ()
         };
-        ReasonReact.NoUpdate;
+        ReasonReact.Update({...state, gameOver: true});
       };
     },
 
   render: self => {
     let gridToRender = Functions.mapBlockToGridOk(self.state.gridState);
+
     <div className="Game">
-      <Grid grid=gridToRender />
-    </div>;
+      <Grid.NextBlockArea grid=self.state.nextBlock />
+      <Grid.GameArea grid=gridToRender />
+      <Grid.NextBlockArea grid=self.state.nextBlock />
+    </div>
+
   },
 };

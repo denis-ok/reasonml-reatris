@@ -144,7 +144,7 @@ let genInitBlockPosition = (block: block, grid: grid) : blockPosition => {
   position;
 };
 
-let tick = ({blockPosition, block, grid}: gridState) => {
+let tick = ({blockPosition, block, grid}, nextBlock: block) : gridState => {
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
 
@@ -155,8 +155,6 @@ let tick = ({blockPosition, block, grid}: gridState) => {
   } else {
     let nextGrid =
       mapBlockToGridOk({blockPosition, block, grid}) |> removeFilledRows;
-
-    let nextBlock = Blocks.getRandomBlock();
 
     let nextState = {
       block: nextBlock,

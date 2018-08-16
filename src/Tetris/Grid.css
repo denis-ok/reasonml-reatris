@@ -2,12 +2,11 @@
   padding: 5px;
   background: rgb(100, 100, 100);
   width: auto;
-  margin-top: 16px;
 }
 
 .Grid-container {
   width: 420px;
-  margin: 10px auto;
+  margin: auto;
 }
 
 .Grid-row {
@@ -31,6 +30,19 @@
   border: solid 1px #687259;
   background: #A5AF92;
 }
+
 .Cell:hover {
   background-color: #484d52;
+}
+
+.NextBlock-container {
+  width: 168px;
+  height: 126px;
+  margin: auto;
+}
+
+.Container {
+  display: inline-block;
+  vertical-align: top;
+  margin: 10px;
 }
