@@ -21,11 +21,16 @@ let initGameState : gameState = {
   nextBlock: Blocks.getRandomBlock(),
   gameOver: false,
   intervalId: None,
+  countdownCounter: 3,
+  countdownId: ref(None)
 };
 
 type state = gameState;
 
 type action =
+  | StartGame
+  | StartCountdown
+  | Countdown
   | SetIntervalId(Js.Global.intervalId)
   | Tick
   | MoveBlock(direction)
@@ -39,6 +44,7 @@ let keyToAction = (event, self) => {
   | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
   | "ArrowDown" => self.ReasonReact.send(MoveBlock(Down))
   | "ArrowUp" => self.ReasonReact.send(RotateBlock)
+  | "Enter" => self.ReasonReact.send(StartCountdown)
   | _ => ()
   };
 };
@@ -52,14 +58,42 @@ let make = _children => {
   initialState: () => initGameState,
 
   didMount: self => {
-    let intervalId = Js.Global.setInterval(() => self.send(Tick), 500);
-    self.send(SetIntervalId(intervalId));
-
     addKeyDownEventListener(self.handle(keyToAction), document);
   },
 
   reducer: (action, state) =>
     switch (action) {
+    | StartGame => {
+      ReasonReact.SideEffects(self => {
+        let intervalId = Js.Global.setInterval(() => self.send(Tick), 500);
+        self.send(SetIntervalId(intervalId));
+      });
+    }
+
+    | StartCountdown => {
+      ReasonReact.SideEffects(self => {
+        let countdownId = Js.Global.setInterval(() => self.send(Countdown), 1000);
+        state.countdownId := Some(countdownId);
+      });
+    }
+
+    | Countdown => {
+      let counter = state.countdownCounter;
+      Js.log(counter);
+
+      if (counter > 0) {
+        ReasonReact.Update({...state, countdownCounter: state.countdownCounter - 1})
+      } else {
+        ReasonReact.SideEffects(self => {
+          switch (self.state.countdownId^) {
+            | Some(id) => Js.Global.clearInterval(id)
+            | None => ()
+            }
+          self.send(StartGame);
+        });
+      }
+    }
+
     | SetIntervalId(id) =>
       ReasonReact.Update({...state, intervalId: Some(id)})
 
@@ -102,6 +136,5 @@ let make = _children => {
       <Grid.GameArea grid=gridToRender />
       <Grid.NextBlockArea grid=self.state.nextBlock />
     </div>
-
   },
 };

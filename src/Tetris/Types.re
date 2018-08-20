@@ -27,12 +27,16 @@ type blockSize = {
 type nextBlock = block;
 type gameOver = bool;
 type intervalId = option(Js.Global.intervalId);
+type countdownId = ref(option(Js.Global.intervalId));
+type countdownCounter = int;
 
 type gameState = {
   gridState,
   nextBlock,
   gameOver,
-  intervalId
+  intervalId,
+  countdownCounter,
+  countdownId
 };
 
 type direction = Left | Up | Right | Down | Unknown;
