@@ -25,7 +25,11 @@ module Row = {
     ...component,
     render: _self =>
       <div className="Grid-row">
-        (row |> Array.mapi((i, cell) => <Tile key=string_of_int(i) cell />) |> ReasonReact.array)
+        (
+          row
+          |> Array.mapi((i, cell) => <Tile key=(string_of_int(i)) cell />)
+          |> ReasonReact.array
+        )
       </div>,
   };
 };
@@ -38,22 +42,48 @@ module NextBlockArea = {
     render: _self =>
       <div className="NextBlock-container Container">
         <div className="NextBlock">
-          (grid |> Array.mapi((i, row) => <Row key=string_of_int(i) row />) |> ReasonReact.array)
+          (
+            grid
+            |> Array.mapi((i, row) => <Row key=(string_of_int(i)) row />)
+            |> ReasonReact.array
+          )
         </div>
       </div>,
   };
 };
 
+module CountdownCounter = {
+  let component = ReasonReact.statelessComponent("CounterSquare");
+
+  let make = (~counter: countdownCounter, _children) => {
+    ...component,
+    render: _self =>
+      <div className="Counter">
+        <div>
+          <p className="Number">
+            (ReasonReact.string(string_of_int(counter)))
+          </p>
+        </div>
+      </div>,
+  };
+};
 
 module GameArea = {
   let component = ReasonReact.statelessComponent("Grid");
 
-  let make = (~grid: grid, _children) => {
+  let make = (~grid: grid, ~counter: countdownCounter, _children) => {
     ...component,
     render: _self =>
       <div className="Grid-container Container">
         <div className="Grid">
-          (grid |> Array.mapi((i, row) => i > 1 ? <Row key=string_of_int(i) row /> : ReasonReact.null) |> ReasonReact.array)
+          (
+            grid
+            |> Array.mapi((i, row) =>
+                 i > 1 ? <Row key=(string_of_int(i)) row /> : ReasonReact.null
+               )
+            |> ReasonReact.array
+          )
+          (counter > 0 ? <CountdownCounter counter /> : ReasonReact.null)
         </div>
       </div>,
   };

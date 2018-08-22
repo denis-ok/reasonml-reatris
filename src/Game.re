@@ -133,7 +133,7 @@ let make = _children => {
 
     <div className="Game">
       <Grid.NextBlockArea grid=self.state.nextBlock />
-      <Grid.GameArea grid=gridToRender />
+      <Grid.GameArea grid=gridToRender counter=self.state.countdownCounter />
       <Grid.NextBlockArea grid=self.state.nextBlock />
     </div>
   },
