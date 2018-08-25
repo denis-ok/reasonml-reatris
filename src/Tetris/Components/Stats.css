@@ -1,0 +1,27 @@
+.Stats {
+  display: inline-block;
+  width: 250px;
+  height: auto;
+  margin: 10px;
+  padding: 0;
+  vertical-align: top;
+}
+
+.StatsRow {
+  font-size: 32px;
+  color: #A5AF92;
+}
+
+.StatName {
+  font-weight: bold;
+}
+
+.StatValue {
+  font-weight: bold;
+}
+
+.StatsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}

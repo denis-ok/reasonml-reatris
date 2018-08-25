@@ -10,6 +10,12 @@ let firstBlock = Blocks.getRandomBlock();
 
 let initBlockPosition = Functions.genInitBlockPosition(firstBlock, emptyGrid);
 
+let initStats = {
+  score: 0,
+  lines: 0,
+  level: 1
+}
+
 let initGridState = {
   block: firstBlock,
   blockPosition: initBlockPosition,
@@ -22,7 +28,8 @@ let initGameState : gameState = {
   gameOver: false,
   intervalId: None,
   countdownCounter: 3,
-  countdownId: ref(None)
+  countdownId: ref(None),
+  stats: initStats
 };
 
 type state = gameState;
@@ -134,7 +141,7 @@ let make = _children => {
     <div className="Game">
       <Grid.NextBlockArea grid=self.state.nextBlock />
       <Grid.GameArea grid=gridToRender counter=self.state.countdownCounter />
-      <Grid.NextBlockArea grid=self.state.nextBlock />
+      <Stats.StatsContainer stats=self.state.stats />
     </div>
   },
 };

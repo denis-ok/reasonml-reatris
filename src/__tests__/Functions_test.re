@@ -153,7 +153,9 @@ let () =
         [|X, O, X|],
         |];
 
-        let result = removeFilledRows(grid);
+        let indexesToRemove = getStrokeIndexes(grid);
+
+        let result = removeFilledRows(grid, indexesToRemove);
 
         expect(result) |> toEqual(expected);
       });
@@ -175,7 +177,9 @@ let () =
         [|O, X, O|],
         |];
 
-        let result = removeFilledRows(grid);
+        let indexesToRemove = getStrokeIndexes(grid);
+
+        let result = removeFilledRows(grid, indexesToRemove);
 
         expect(result) |> toEqual(expected);
       });
@@ -198,8 +202,9 @@ let () =
         [|X, O, X|],
         |];
 
+        let indexesToRemove = getStrokeIndexes(grid);
 
-        let result = removeFilledRows(grid);
+        let result = removeFilledRows(grid, indexesToRemove);
 
         expect(result) |> toEqual(expected);
       });
@@ -225,9 +230,11 @@ let () =
         |];
 
 
-        let result = removeFilledRows(grid);
+      let indexesToRemove = getStrokeIndexes(grid);
 
-        expect(result) |> toEqual(expected);
+      let result = removeFilledRows(grid, indexesToRemove);
+
+      expect(result) |> toEqual(expected);
       });
     });
 
