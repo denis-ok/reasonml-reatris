@@ -49,20 +49,47 @@ type action =
   | RotateBlock
   | UpdateLevel;
 
-let keyToAction = (event, self) => {
-  let key = event |> Webapi.Dom.KeyboardEvent.key;
+type self = ReasonReact.self(state, ReasonReact.noRetainedProps, action);
 
-  switch (key) {
-  | "ArrowLeft" => self.ReasonReact.send(MoveBlock(Left))
-  | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
-  | "ArrowDown" => self.ReasonReact.send(Tick)
-  | "ArrowUp" => self.ReasonReact.send(RotateBlock)
-  | "Enter" => self.ReasonReact.send(StartCountdown)
-  | _ => ()
+let keyDownToAction = (event, self: self) => {
+  let key = event |> Webapi.Dom.KeyboardEvent.key;
+  let repeated = event |> Webapi.Dom.KeyboardEvent.repeat;
+
+  if (repeated) {
+    ();
+  } else {
+    switch (key) {
+    | "ArrowDown" => {
+      clearIntervalId(self.state.intervalId);
+      let intervalId = Js.Global.setInterval(() => self.send(Tick), 30);
+      self.state.intervalId := Some(intervalId);
+    }
+    | "ArrowLeft" => self.ReasonReact.send(MoveBlock(Left))
+    | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
+    | "ArrowUp" => self.ReasonReact.send(RotateBlock)
+    | "Enter" => self.ReasonReact.send(StartCountdown)
+    | _ => ()
+    };
   };
 };
 
+let keyUpToAction = (event, self: self) => {
+  let key = event |> Webapi.Dom.KeyboardEvent.key;
+
+  switch (key) {
+    | "ArrowDown" => {
+      let delay = Functions.calcDelay(self.state.stats.level);
+      clearIntervalId(self.state.intervalId);
+      let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
+      self.state.intervalId := Some(intervalId);
+    }
+    | _ => ()
+    };
+};
+
+
 let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
+let addKeyUpEventListener = Webapi.Dom.Document.addKeyUpEventListener;
 
 let component = ReasonReact.reducerComponent("Game");
 
@@ -71,7 +98,8 @@ let make = _children => {
   initialState: () => initGlobalState,
 
   didMount: self => {
-    addKeyDownEventListener(self.handle(keyToAction), document);
+    addKeyDownEventListener(self.handle(keyDownToAction), document);
+    addKeyUpEventListener(self.handle(keyUpToAction), document);
   },
 
   reducer: (action, state) =>
@@ -153,6 +181,7 @@ let make = _children => {
 
   render: self => {
     let gridToRender = Functions.mapBlockToGrid(self.state.gridState);
+
 
     <div className="Game">
       <Grid.NextBlockArea grid=self.state.nextBlock />
