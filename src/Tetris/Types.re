@@ -13,8 +13,6 @@ type blockPosition = {
   y: int,
 };
 
-
-
 type blockSize = {
   width: int,
   height: int,
@@ -24,7 +22,7 @@ type nextBlock = block;
 
 type gameOver = bool;
 
-type intervalId = option(Js.Global.intervalId);
+type intervalId = ref(option(Js.Global.intervalId));
 
 type countdownId = ref(option(Js.Global.intervalId));
 
@@ -56,7 +54,5 @@ type globalState = {
   countdownId,
   stats
 };
-
-
 
 type direction = Left | Up | Right | Down | Unknown;

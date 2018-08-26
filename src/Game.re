@@ -13,7 +13,7 @@ let initBlockPosition = Functions.genInitBlockPosition(firstBlock, emptyGrid);
 let initStats = {
   score: 0,
   lines: 0,
-  level: 1
+  level: 0
 }
 
 let initGridState = {
@@ -25,10 +25,10 @@ let initGridState = {
 let initGameState : globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
-  intervalId: None,
+  stats: initStats,
   countdownCounter: 3,
+  intervalId: ref(None),
   countdownId: ref(None),
-  stats: initStats
 };
 
 type state = globalState;
@@ -37,7 +37,6 @@ type action =
   | StartGame
   | StartCountdown
   | Countdown
-  | SetIntervalId(Js.Global.intervalId)
   | Tick
   | MoveBlock(direction)
   | RotateBlock;
@@ -72,7 +71,7 @@ let make = _children => {
     | StartGame => {
       ReasonReact.SideEffects(self => {
         let intervalId = Js.Global.setInterval(() => self.send(Tick), 500);
-        self.send(SetIntervalId(intervalId));
+        state.intervalId := Some(intervalId);
       });
     }
 
@@ -100,9 +99,6 @@ let make = _children => {
       }
     }
 
-    | SetIntervalId(id) =>
-      ReasonReact.Update({...state, intervalId: Some(id)})
-
     | MoveBlock(direction) =>
       ReasonReact.Update({...state, gridState: Functions.getGridStateAfterMove(direction, state.gridState)});
 
@@ -126,7 +122,7 @@ let make = _children => {
       | false => ReasonReact.Update({...state, gridState, stats, nextBlock: nextBlock})
       | true =>
         Js.log("Game over!");
-        switch (state.intervalId) {
+        switch (state.intervalId^) {
         | Some(id) => Js.Global.clearInterval(id)
         | None => ()
         };
