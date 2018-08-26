@@ -22,17 +22,16 @@ let initGridState = {
   grid: emptyGrid,
 };
 
-let initGameState : gameState = {
+let initGameState : globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
-  gameOver: false,
   intervalId: None,
   countdownCounter: 3,
   countdownId: ref(None),
   stats: initStats
 };
 
-type state = gameState;
+type state = globalState;
 
 type action =
   | StartGame
@@ -49,7 +48,7 @@ let keyToAction = (event, self) => {
   switch (key) {
   | "ArrowLeft" => self.ReasonReact.send(MoveBlock(Left))
   | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
-  | "ArrowDown" => self.ReasonReact.send(MoveBlock(Down))
+  | "ArrowDown" => self.ReasonReact.send(Tick)
   | "ArrowUp" => self.ReasonReact.send(RotateBlock)
   | "Enter" => self.ReasonReact.send(StartCountdown)
   | _ => ()
@@ -111,27 +110,27 @@ let make = _children => {
       ReasonReact.Update({...state, gridState: Functions.getGridStateAfterRotate(state.gridState)});
 
     | Tick =>
-      let nextGridState = Functions.tick(state.gridState, state.nextBlock);
+      let nextGameState = Functions.tick(state.gridState, state.nextBlock, state.stats);
+
+      let {gridState, stats, gameOver } = nextGameState;
 
       let nextBlock = {
-        if (nextGridState.block === state.nextBlock) {
+        if (gridState.block === state.nextBlock) {
           Blocks.getRandomBlock()
         } else {
           state.nextBlock
         }
       };
 
-      let gameOver = Functions.isGameOver(nextGridState);
-
       switch (gameOver) {
-      | false => ReasonReact.Update({...state, gridState: nextGridState, nextBlock: nextBlock})
+      | false => ReasonReact.Update({...state, gridState, stats, nextBlock: nextBlock})
       | true =>
         Js.log("Game over!");
         switch (state.intervalId) {
         | Some(id) => Js.Global.clearInterval(id)
         | None => ()
         };
-        ReasonReact.Update({...state, gameOver: true});
+        ReasonReact.NoUpdate;
       };
     },
 

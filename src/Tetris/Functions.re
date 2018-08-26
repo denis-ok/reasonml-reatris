@@ -143,35 +143,59 @@ let genInitBlockPosition = (block: block, grid: grid) : blockPosition => {
   position;
 };
 
-let tick = ({blockPosition, block, grid}, nextBlock: block) : gridState => {
+let calcNextStats = (~stats: stats, ~strokesCount) => {
+  let {score, lines, level} = stats;
+
+  let strokesBonus =
+    switch (strokesCount) {
+    | 0 => 0
+    | 1 => 10
+    | 2 => 25
+    | 3 => 50
+    | _ => 100
+    };
+
+  {
+    score: score + strokesBonus + 1,
+    lines: lines + strokesCount,
+    level: level
+  }
+};
+
+
+let tick = (gridState, nextBlock, stats) : gameState => {
+  let {blockPosition, block, grid} = gridState;
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
 
   let canMap = canMapBlock(nextPosition, block, grid);
 
   if (canMap) {
-    {block, blockPosition: nextPosition, grid};
+    let nextStats = calcNextStats(~stats=stats, ~strokesCount=0);
+    let nextGridState = {block, blockPosition: nextPosition, grid};
+
+    { gridState: nextGridState, stats: nextStats, gameOver: false};
   } else {
     let nextGrid =  mapBlockToGridOk({blockPosition, block, grid});
     let strokeIndexes = getStrokeIndexes(nextGrid);
     let nextGridWithRemovedRows = removeFilledRows(nextGrid, strokeIndexes);
 
-    let nextState = {
+    let nextStats = calcNextStats(~stats=stats, ~strokesCount=Array.length(strokeIndexes));
+
+    let nextGridState = {
       block: nextBlock,
       blockPosition: genInitBlockPosition(nextBlock, grid),
       grid: nextGridWithRemovedRows,
     };
 
-    nextState;
+    let gameOver = {
+      let blockHeight = getHeight(nextBlock);
+      let {y} = nextPosition;
+      y == 3 - blockHeight && ! canMap;
+    };
+
+    { gridState: nextGridState, stats: nextStats, gameOver};
   };
-};
-
-let isGameOver = ({blockPosition, block, grid}: gridState) => {
-  let canMap = canMapBlock(blockPosition, block, grid);
-  let {y} = blockPosition;
-  let blockHeight = getHeight(block);
-
-  y == 3 - blockHeight && ! canMap;
 };
 
 let getNextPositionByDirection = (direction, currentPosition) => {
@@ -217,23 +241,4 @@ let getGridStateAfterRotate = gridState => {
   let canMap = canMapBlock(blockPosition, rotatedBlock, grid);
 
   canMap ? {...gridState, block: rotatedBlock} : gridState;
-};
-
-let calcNextStats = (stats: stats, strokesCount) => {
-  let {score, lines, level} = stats;
-
-  let strokesBonus =
-    switch (strokesCount) {
-    | 0 => 0
-    | 1 => 10
-    | 2 => 25
-    | 3 => 50
-    | _ => 100
-    };
-
-  {
-    score: score + strokesBonus + 1,
-    lines: lines + strokesCount,
-    level: level
-  }
 };

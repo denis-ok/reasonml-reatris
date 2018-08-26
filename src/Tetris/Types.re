@@ -13,11 +13,7 @@ type blockPosition = {
   y: int,
 };
 
-type gridState = {
-  block : block,
-  blockPosition: blockPosition,
-  grid: grid,
-};
+
 
 type blockSize = {
   width: int,
@@ -34,6 +30,12 @@ type countdownId = ref(option(Js.Global.intervalId));
 
 type countdownCounter = int;
 
+type gridState = {
+  block : block,
+  blockPosition: blockPosition,
+  grid: grid,
+};
+
 type stats = {
   score: int,
   lines: int,
@@ -42,8 +44,13 @@ type stats = {
 
 type gameState = {
   gridState,
+  stats,
+  gameOver
+};
+
+type globalState = {
+  gridState,
   nextBlock,
-  gameOver,
   intervalId,
   countdownCounter,
   countdownId,

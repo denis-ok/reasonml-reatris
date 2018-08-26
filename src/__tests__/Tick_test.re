@@ -59,19 +59,37 @@ let () =
     describe("tick", () => {
 
       test("Must update coord only", () => {
-        let stateBefore = {
+        let statsBefore = {
+          score: 10,
+          lines: 0,
+          level: 1
+        };
+
+        let gridStateBefore = {
           block: testBlock,
           blockPosition: { x: 0, y: 3 },
           grid: testGrid1
         };
 
-        let expected = {
+        let statsAfter = {
+          score: 11,
+          lines: 0,
+          level: 1
+        };
+
+        let gridStateAfter = {
           block: testBlock,
           blockPosition: { x: 0, y: 4 },
           grid: testGrid1
         };
 
-        expect(tick(stateBefore, testBlock)) |> toEqual(expected);
+        let expected = {
+          gridState: gridStateAfter,
+          stats: statsAfter,
+          gameOver: false
+        };
+
+        expect(tick(gridStateBefore, testBlock, statsBefore)) |> toEqual(expected);
       });
 
       /* test("should return new state after strike", () => {
