@@ -143,8 +143,13 @@ let genInitBlockPosition = (block: block, grid: grid) : blockPosition => {
   position;
 };
 
+let calcLevel = score => {
+  let divided = score / 500;
+  Js.Math.floor(float_of_int(divided)) + 1;
+};
+
 let calcNextStats = (~stats: stats, ~strokesCount) => {
-  let {score, lines, level} = stats;
+  let {score, lines} = stats;
 
   let strokesBonus =
     switch (strokesCount) {
@@ -155,13 +160,14 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
     | _ => 100
     };
 
+  let newScore = score + strokesBonus + 1;
+
   {
-    score: score + strokesBonus + 1,
+    score: newScore,
     lines: lines + strokesCount,
-    level: level
+    level: calcLevel(newScore)
   }
 };
-
 
 let tick = (gridState, nextBlock, stats) : gameState => {
   let {blockPosition, block, grid} = gridState;
@@ -242,3 +248,30 @@ let getGridStateAfterRotate = gridState => {
 
   canMap ? {...gridState, block: rotatedBlock} : gridState;
 };
+
+
+let calcDelay = level =>
+  switch (level) {
+  | 1 => 600
+  | 2 => 500
+  | 3 => 450
+  | 4 => 400
+  | 5 => 350
+  | 6 => 300
+  | 7 => 250
+  | 8 => 200
+  | 9 => 150
+  | 10 => 140
+  | 11 => 130
+  | 12 => 120
+  | 13 => 110
+  | 14 => 100
+  | 15 => 90
+  | 16 => 80
+  | 17 => 70
+  | 18 => 60
+  | 19 => 50
+  | 20 => 40
+  | 21 => 30
+  | _ => 5
+  };
