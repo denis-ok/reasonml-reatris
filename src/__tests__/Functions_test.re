@@ -102,7 +102,12 @@ let () =
     describe("map block to grid", () => {
       test("map block imperative", () => {
 
-        let result = mapBlockToGrid({ x:0, y: 4 }, testBlock, testGrid);
+        let result = mapBlockToGrid(
+          {
+          blockPosition: { x:0, y: 4 },
+          block: testBlock,
+          grid: testGrid});
+
         let expected =[|
         [|O, O, O, O, O, O|],
         [|O, O, O, O, O, O|],

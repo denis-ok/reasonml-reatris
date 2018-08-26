@@ -67,20 +67,7 @@ let mapBlockRowToGridRow = (posX: int, blockRow: row, gridRow: row) => {
   newGridRow;
 };
 
-let mapBlockToGrid = (position: blockPosition, block: block, grid: grid) => {
-  let newGrid = Array.copy(grid);
-
-  block
-  |> Array.iteri((i, blockRow) => {
-       let gridRowIndex = position.y + i;
-       newGrid[gridRowIndex] =
-         mapBlockRowToGridRow(position.x, blockRow, grid[gridRowIndex]);
-     });
-
-  newGrid;
-};
-
-let mapBlockToGridOk = ({blockPosition, block, grid}: gridState) => {
+let mapBlockToGrid = ({blockPosition, block, grid}: gridState) => {
   let newGrid = Array.copy(grid);
 
   block
@@ -182,7 +169,7 @@ let tick = (gridState, nextBlock, stats) : gameState => {
 
     { gridState: nextGridState, stats: nextStats, gameOver: false};
   } else {
-    let nextGrid =  mapBlockToGridOk({blockPosition, block, grid});
+    let nextGrid =  mapBlockToGrid({blockPosition, block, grid});
     let strokeIndexes = getStrokeIndexes(nextGrid);
     let nextGridWithRemovedRows = removeFilledRows(nextGrid, strokeIndexes);
 

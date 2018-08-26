@@ -152,7 +152,7 @@ let make = _children => {
     },
 
   render: self => {
-    let gridToRender = Functions.mapBlockToGridOk(self.state.gridState);
+    let gridToRender = Functions.mapBlockToGrid(self.state.gridState);
 
     <div className="Game">
       <Grid.NextBlockArea grid=self.state.nextBlock />
