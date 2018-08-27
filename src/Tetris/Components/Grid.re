@@ -66,13 +66,17 @@ module CountdownCounter = {
   let make = (~counter: countdownCounter, _children) => {
     ...component,
     render: _self =>
-      <div className="Counter">
-        <div>
-          <p className="Number">
-            (ReasonReact.string(string_of_int(counter)))
-          </p>
-        </div>
-      </div>,
+      if (counter == 0) {
+        ReasonReact.null;
+      } else {
+        <div className="Counter">
+          <div>
+            <p className="Number">
+              (ReasonReact.string(string_of_int(counter)))
+            </p>
+          </div>
+        </div>;
+      }
   };
 };
 
@@ -91,7 +95,7 @@ module GameArea = {
                )
             |> ReasonReact.array
           )
-          (counter > 0 ? <CountdownCounter counter /> : ReasonReact.null)
+          <CountdownCounter counter />
         </div>
       </div>,
   };

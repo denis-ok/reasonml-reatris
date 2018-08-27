@@ -22,7 +22,7 @@ let initGlobalState: globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: initStats,
-  countdownCounter: 3,
+  countdownCounter: 0,
   intervalId: ref(None),
   countdownId: ref(None),
   started: false,
@@ -110,7 +110,8 @@ let make = _children => {
       );
 
     | StartCountdown =>
-      ReasonReact.SideEffects(
+      ReasonReact.UpdateWithSideEffects(
+        {...state, countdownCounter : 3},
         (
           self => {
             let countdownId =
@@ -204,7 +205,7 @@ let make = _children => {
 
     <div className="Game">
       <Grid.NextBlockArea nextBlock started />
-      <Grid.GameArea grid=gridToRender counter=countdownCounter />
+      <Grid.GameArea grid=gridToRender counter=countdownCounter/>
       <Stats.StatsContainer stats started />
     </div>;
   },
