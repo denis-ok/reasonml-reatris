@@ -10,11 +10,7 @@ let firstBlock = Blocks.getRandomBlock();
 
 let initBlockPosition = Functions.genInitBlockPosition(firstBlock, emptyGrid);
 
-let initStats = {
-  score: 0,
-  lines: 0,
-  level: 1
-};
+let initStats = {score: 0, lines: 0, level: 1};
 
 let initGridState = {
   block: firstBlock,
@@ -22,21 +18,21 @@ let initGridState = {
   grid: emptyGrid,
 };
 
-let initGlobalState : globalState = {
+let initGlobalState: globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: initStats,
   countdownCounter: 3,
   intervalId: ref(None),
   countdownId: ref(None),
+  started: false,
 };
 
-let clearIntervalId = (id : intervalId) => {
+let clearIntervalId = (id: intervalId) =>
   switch (id^) {
-    | Some(id) => Js.Global.clearInterval(id)
-    | None => ()
-    };
-};
+  | Some(id) => Js.Global.clearInterval(id)
+  | None => ()
+  };
 
 type state = globalState;
 
@@ -59,11 +55,10 @@ let keyDownToAction = (event, self: self) => {
     ();
   } else {
     switch (key) {
-    | "ArrowDown" => {
+    | "ArrowDown" =>
       clearIntervalId(self.state.intervalId);
       let intervalId = Js.Global.setInterval(() => self.send(Tick), 30);
       self.state.intervalId := Some(intervalId);
-    }
     | "ArrowLeft" => self.ReasonReact.send(MoveBlock(Left))
     | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
     | "ArrowUp" => self.ReasonReact.send(RotateBlock)
@@ -77,16 +72,14 @@ let keyUpToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
 
   switch (key) {
-    | "ArrowDown" => {
-      let delay = Functions.calcDelay(self.state.stats.level);
-      clearIntervalId(self.state.intervalId);
-      let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
-      self.state.intervalId := Some(intervalId);
-    }
-    | _ => ()
-    };
+  | "ArrowDown" =>
+    let delay = Functions.calcDelay(self.state.stats.level);
+    clearIntervalId(self.state.intervalId);
+    let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
+    self.state.intervalId := Some(intervalId);
+  | _ => ()
+  };
 };
-
 
 let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
 let addKeyUpEventListener = Webapi.Dom.Document.addKeyUpEventListener;
@@ -96,97 +89,123 @@ let component = ReasonReact.reducerComponent("Game");
 let make = _children => {
   ...component,
   initialState: () => initGlobalState,
-
   didMount: self => {
     addKeyDownEventListener(self.handle(keyDownToAction), document);
     addKeyUpEventListener(self.handle(keyUpToAction), document);
   },
-
   reducer: (action, state) =>
     switch (action) {
-    | StartGame => {
+    | StartGame =>
       let delay = Functions.calcDelay(state.stats.level);
-      ReasonReact.SideEffects(self => {
-        let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
-        state.intervalId := Some(intervalId);
-      });
-    }
 
-    | StartCountdown => {
-      ReasonReact.SideEffects(self => {
-        let countdownId = Js.Global.setInterval(() => self.send(Countdown), 1000);
-        state.countdownId := Some(countdownId);
-      });
-    }
+      ReasonReact.UpdateWithSideEffects(
+        {...state, started: true},
+        (
+          self => {
+            let intervalId =
+              Js.Global.setInterval(() => self.send(Tick), delay);
+            state.intervalId := Some(intervalId);
+          }
+        ),
+      );
 
-    | Countdown => {
+    | StartCountdown =>
+      ReasonReact.SideEffects(
+        (
+          self => {
+            let countdownId =
+              Js.Global.setInterval(() => self.send(Countdown), 1000);
+            state.countdownId := Some(countdownId);
+          }
+        ),
+      )
+
+    | Countdown =>
       let counter = state.countdownCounter;
-      /* Js.log(counter); */
 
-      if (counter > 0) {
-        ReasonReact.Update({...state, countdownCounter: state.countdownCounter - 1})
-      } else {
-        ReasonReact.SideEffects(self => {
-          clearIntervalId(state.countdownId);
-          self.send(StartGame);
+      if (counter > 1) {
+        ReasonReact.Update({
+          ...state,
+          countdownCounter: state.countdownCounter - 1,
         });
+      } else {
+        ReasonReact.UpdateWithSideEffects({...state, countdownCounter: 0 },
+          (
+            self => {
+              clearIntervalId(state.countdownId);
+              self.send(StartGame);
+            }
+          ),
+        );
       }
-    }
 
     | MoveBlock(direction) =>
-      ReasonReact.Update({...state, gridState: Functions.getGridStateAfterMove(direction, state.gridState)});
+      ReasonReact.Update({
+        ...state,
+        gridState:
+          Functions.getGridStateAfterMove(direction, state.gridState),
+      })
 
     | RotateBlock =>
-      ReasonReact.Update({...state, gridState: Functions.getGridStateAfterRotate(state.gridState)});
+      ReasonReact.Update({
+        ...state,
+        gridState: Functions.getGridStateAfterRotate(state.gridState),
+      })
 
-    | UpdateLevel => {
+    | UpdateLevel =>
       let delay = Functions.calcDelay(state.stats.level);
 
       clearIntervalId(state.intervalId);
 
-      ReasonReact.SideEffects(self => {
-        let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
-        state.intervalId := Some(intervalId);
-      });
-    };
-
+      ReasonReact.SideEffects(
+        (
+          self => {
+            let intervalId =
+              Js.Global.setInterval(() => self.send(Tick), delay);
+            state.intervalId := Some(intervalId);
+          }
+        ),
+      );
 
     | Tick =>
-      let nextGameState = Functions.tick(state.gridState, state.nextBlock, state.stats);
+      let nextGameState =
+        Functions.tick(state.gridState, state.nextBlock, state.stats);
 
-      let { gridState, stats, gameOver } = nextGameState;
+      let {gridState, stats, gameOver} = nextGameState;
 
-      let nextBlock = {
+      let nextBlock =
         if (gridState.block === state.nextBlock) {
-          Blocks.getRandomBlock()
+          Blocks.getRandomBlock();
         } else {
-          state.nextBlock
-        }
-      };
+          state.nextBlock;
+        };
 
       if (gameOver) {
         Js.log("Game over!");
         clearIntervalId(state.intervalId);
         ReasonReact.NoUpdate;
       } else {
-        let nextState = {...state, gridState, stats, nextBlock: nextBlock};
+        let nextState = {...state, gridState, stats, nextBlock};
 
         if (state.stats.level < stats.level) {
-          ReasonReact.UpdateWithSideEffects(nextState, self => self.send(UpdateLevel));
+          ReasonReact.UpdateWithSideEffects(
+            nextState,
+            (self => self.send(UpdateLevel)),
+          );
         } else {
           ReasonReact.Update(nextState);
-        }
-      }
+        };
+      };
     },
-
   render: self => {
-    let gridToRender = Functions.mapBlockToGrid(self.state.gridState);
-
+    let {nextBlock, gridState, countdownCounter, stats, started} = self.state;
+    let gridToRender =
+      started ? Functions.mapBlockToGrid(gridState) : emptyGrid;
 
     <div className="Game">
-      <Grid.NextBlockArea grid=self.state.nextBlock />
-      <Grid.GameArea grid=gridToRender counter=self.state.countdownCounter />
-      <Stats.StatsContainer stats=self.state.stats />
-    </div>
+      <Grid.NextBlockArea nextBlock started />
+      <Grid.GameArea grid=gridToRender counter=countdownCounter />
+      <Stats.StatsContainer stats started />
+    </div>;
   },
 };

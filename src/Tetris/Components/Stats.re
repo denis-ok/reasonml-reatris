@@ -10,7 +10,9 @@ module StatsRow = {
     render: _self =>
       <div className="StatsRow">
         <p className="StatName"> (ReasonReact.string(name)) </p>
-        <p className="StatValue"> (ReasonReact.string(string_of_int(value))) </p>
+        <p className="StatValue">
+          (ReasonReact.string(string_of_int(value)))
+        </p>
       </div>,
   };
 };
@@ -18,15 +20,21 @@ module StatsRow = {
 module StatsContainer = {
   let component = ReasonReact.statelessComponent("StatsContainer");
 
-  let make = (~stats: stats, _children) => {
+  let make = (~stats: stats, ~started, _children) => {
     ...component,
     render: _self =>
       <div className="Stats">
-        <div className="StatsContainer">
-          <StatsRow name="Score" value=stats.score />
-          <StatsRow name="Lines" value=stats.lines />
-          <StatsRow name="Level" value=stats.level />
-        </div>
+        (
+          if (started) {
+            <div className="StatsContainer">
+              <StatsRow name="Score" value=stats.score />
+              <StatsRow name="Lines" value=stats.lines />
+              <StatsRow name="Level" value=stats.level />
+            </div>;
+          } else {
+            ReasonReact.null;
+          }
+        )
       </div>,
   };
 };

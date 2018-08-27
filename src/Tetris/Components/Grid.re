@@ -37,17 +37,25 @@ module Row = {
 module NextBlockArea = {
   let component = ReasonReact.statelessComponent("NextBlockArea");
 
-  let make = (~grid: grid, _children) => {
+  let make = (~nextBlock: grid, ~started, _children) => {
     ...component,
     render: _self =>
       <div className="NextBlock-container Container">
-        <div className="NextBlock">
-          (
-            grid
-            |> Array.mapi((i, row) => <Row key=(string_of_int(i)) row />)
-            |> ReasonReact.array
-          )
-        </div>
+        (
+          if (started) {
+            <div className="NextBlock">
+              (
+                nextBlock
+                |> Array.mapi((i, row) =>
+                     <Row key=(string_of_int(i)) row />
+                   )
+                |> ReasonReact.array
+              )
+            </div>;
+          } else {
+            ReasonReact.null;
+          }
+        )
       </div>,
   };
 };

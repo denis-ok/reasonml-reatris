@@ -28,6 +28,8 @@ type countdownId = ref(option(Js.Global.intervalId));
 
 type countdownCounter = int;
 
+type started = bool;
+
 type gridState = {
   block : block,
   blockPosition: blockPosition,
@@ -52,7 +54,8 @@ type globalState = {
   intervalId,
   countdownCounter,
   countdownId,
-  stats
+  stats,
+  started
 };
 
 type direction = Left | Up | Right | Down | Unknown;
