@@ -52,8 +52,9 @@ type self = ReasonReact.self(state, ReasonReact.noRetainedProps, action);
 let keyDownToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
   let repeated = event |> Webapi.Dom.KeyboardEvent.repeat;
+  let started = self.state.started;
 
-  if (repeated) {
+  if (! started || repeated) {
     ();
   } else {
     switch (key) {
@@ -64,26 +65,29 @@ let keyDownToAction = (event, self: self) => {
     | "ArrowLeft" => self.ReasonReact.send(MoveBlock(Left))
     | "ArrowRight" => self.ReasonReact.send(MoveBlock(Right))
     | "ArrowUp" => self.ReasonReact.send(RotateBlock)
-    | "Enter" => self.ReasonReact.send(StartCountdown)
     | _ => ()
     };
   };
 };
 
-let clickStart = (_event, self: self) => {
+let clickStart = (_event, self: self) =>
   self.ReasonReact.send(StartCountdown);
-};
 
 let keyUpToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
+  let started = self.state.started;
 
-  switch (key) {
-  | "ArrowDown" =>
-    let delay = Functions.calcDelay(self.state.stats.level);
-    clearIntervalId(self.state.intervalId);
-    let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
-    self.state.intervalId := Some(intervalId);
-  | _ => ()
+  if (! started) {
+    ();
+  } else {
+    switch (key) {
+    | "ArrowDown" =>
+      let delay = Functions.calcDelay(self.state.stats.level);
+      clearIntervalId(self.state.intervalId);
+      let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
+      self.state.intervalId := Some(intervalId);
+    | _ => ()
+    };
   };
 };
 
@@ -117,11 +121,11 @@ let make = _children => {
 
     | StartCountdown =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, countdownCounter : 3},
+        {...state, countdownCounter: 3},
         (
           self => {
             let countdownId =
-              Js.Global.setInterval(() => self.send(Countdown), 1000);
+              Js.Global.setInterval(() => self.send(Countdown), 2000);
             state.countdownId := Some(countdownId);
           }
         ),
@@ -136,7 +140,8 @@ let make = _children => {
           countdownCounter: state.countdownCounter - 1,
         });
       } else {
-        ReasonReact.UpdateWithSideEffects({...state, countdownCounter: 0 },
+        ReasonReact.UpdateWithSideEffects(
+          {...state, countdownCounter: 0},
           (
             self => {
               clearIntervalId(state.countdownId);
@@ -144,7 +149,7 @@ let make = _children => {
             }
           ),
         );
-      }
+      };
 
     | MoveBlock(direction) =>
       ReasonReact.Update({
@@ -211,7 +216,12 @@ let make = _children => {
 
     <div className="Game">
       <Grid.NextBlockArea nextBlock started />
-      <Grid.GameArea grid=gridToRender counter=countdownCounter started clickStart=self.handle(clickStart)/>
+      <Grid.GameArea
+        grid=gridToRender
+        counter=countdownCounter
+        started
+        clickStart=(self.handle(clickStart))
+      />
       <Stats.StatsContainer stats started />
     </div>;
   },
