@@ -1,0 +1,38 @@
+.Menu-item {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  top: 256px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 244px;
+  height: 82px;
+  font-size: 30px;
+  background: #deeacb;
+  border: 2px solid black;
+}
+
+.Menu-item:hover {
+  background: #546163;
+  cursor: pointer;
+}
+
+.Menu-item:active {
+  background: white;
+  cursor: pointer;
+}
+
+.Start {
+  top: 256px;
+}
+
+.Level {
+  top: 382px;
+}

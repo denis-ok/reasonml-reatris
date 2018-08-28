@@ -141,10 +141,10 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   let strokesBonus =
     switch (strokesCount) {
     | 0 => 0
-    | 1 => 10
-    | 2 => 25
-    | 3 => 50
-    | _ => 100
+    | 1 => 20
+    | 2 => 50
+    | 3 => 100
+    | _ => 200
     };
 
   let newScore = score + strokesBonus + 1;
