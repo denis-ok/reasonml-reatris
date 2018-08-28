@@ -136,7 +136,7 @@ let calcLevel = score => {
 };
 
 let calcNextStats = (~stats: stats, ~strokesCount) => {
-  let {score, lines} = stats;
+  let {score, lines, level} = stats;
 
   let strokesBonus =
     switch (strokesCount) {
@@ -152,7 +152,7 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   {
     score: newScore,
     lines: lines + strokesCount,
-    level: calcLevel(newScore)
+    level: strokesCount > 0 ? calcLevel(newScore) : level
   }
 };
 
