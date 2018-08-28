@@ -83,7 +83,7 @@ module CountdownCounter = {
 module GameArea = {
   let component = ReasonReact.statelessComponent("Grid");
 
-  let make = (~grid: grid, ~counter: countdownCounter, ~started, _children) => {
+  let make = (~grid: grid, ~counter: countdownCounter, ~started, ~clickStart, _children) => {
     ...component,
     render: _self =>
       <div className="Grid-container Container">
@@ -97,7 +97,7 @@ module GameArea = {
           )
           <CountdownCounter counter />
         </div>
-        <Menu started />
+        <Menu counter started clickStart/>
       </div>,
   };
 };

@@ -70,6 +70,10 @@ let keyDownToAction = (event, self: self) => {
   };
 };
 
+let clickStart = (_event, self: self) => {
+  self.ReasonReact.send(StartCountdown);
+};
+
 let keyUpToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
 
@@ -207,7 +211,7 @@ let make = _children => {
 
     <div className="Game">
       <Grid.NextBlockArea nextBlock started />
-      <Grid.GameArea grid=gridToRender counter=countdownCounter started/>
+      <Grid.GameArea grid=gridToRender counter=countdownCounter started clickStart=self.handle(clickStart)/>
       <Stats.StatsContainer stats started />
     </div>;
   },
