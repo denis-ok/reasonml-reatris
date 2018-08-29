@@ -42,6 +42,14 @@ type stats = {
   level: int
 }
 
+type timerIds = {
+  tick: intervalId,
+  countdown: intervalId,
+  moveLeft: intervalId,
+  moveRight: intervalId,
+  rotate: intervalId
+};
+
 type gameState = {
   gridState,
   stats,
@@ -51,11 +59,10 @@ type gameState = {
 type globalState = {
   gridState,
   nextBlock,
-  intervalId,
   countdownCounter,
-  countdownId,
   stats,
-  started
+  started,
+  timerIds
 };
 
 type direction = Left | Up | Right | Down | Unknown;
