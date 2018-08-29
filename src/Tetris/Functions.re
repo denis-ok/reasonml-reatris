@@ -141,10 +141,10 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   let strokesBonus =
     switch (strokesCount) {
     | 0 => 0
-    | 1 => 20
-    | 2 => 50
-    | 3 => 100
-    | _ => 200
+    | 1 => 50
+    | 2 => 150
+    | 3 => 250
+    | _ => 350
     };
 
   let newScore = score + strokesBonus + 1;
@@ -156,7 +156,7 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   }
 };
 
-let tick = (gridState, nextBlock, stats) : gameState => {
+let tick = (gridState, nextBlock, stats) => {
   let {blockPosition, block, grid} = gridState;
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
@@ -187,7 +187,7 @@ let tick = (gridState, nextBlock, stats) : gameState => {
       y == 3 - blockHeight && ! canMap;
     };
 
-    { gridState: nextGridState, stats: nextStats, gameOver};
+    { gridState: nextGridState, stats: nextStats, gameOver: gameOver };
   };
 };
 

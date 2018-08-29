@@ -51,18 +51,19 @@ type timerIds = {
 };
 
 type gameState = {
-  gridState,
-  stats,
-  gameOver
+  gridState: gridState,
+  stats: stats,
+  gameOver: gameOver
 };
 
 type globalState = {
-  gridState,
-  nextBlock,
-  countdownCounter,
-  stats,
-  started,
-  timerIds
+  gridState: gridState,
+  nextBlock: block,
+  countdownCounter: countdownCounter,
+  stats: stats,
+  timerIds: timerIds,
+  started: started,
+  gameOver: gameOver
 };
 
 type direction = Left | Up | Right | Down | Unknown;

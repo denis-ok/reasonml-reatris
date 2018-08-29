@@ -31,10 +31,11 @@ let initTimerIds = {
 let initGlobalState: globalState = {
   gridState: initGridState,
   nextBlock: firstNextBlock,
-  stats: initStats,
   countdownCounter: 0,
-  started: false,
+  stats: initStats,
   timerIds: initTimerIds,
+  started: false,
+  gameOver: false
 };
 
 let clearIntervalId = (id: intervalId) =>
@@ -60,6 +61,7 @@ let keyDownToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
   let repeated = event |> Webapi.Dom.KeyboardEvent.repeat;
   let started = self.state.started;
+  let gameOver = self.state.gameOver;
 
   let dropDelay = 30;
   let moveDelay = 50;
@@ -71,7 +73,7 @@ let keyDownToAction = (event, self: self) => {
     timerId := Some(id);
   };
 
-  if (! started || repeated) {
+  if (! started || gameOver || repeated) {
     ();
   } else {
     switch (key) {
@@ -209,25 +211,28 @@ let make = _children => {
       );
 
     | Tick =>
-      let nextGameState = Functions.tick(state.gridState, state.nextBlock, state.stats);
-
-      let {gridState, stats, gameOver} = nextGameState;
+      let next = Functions.tick(state.gridState, state.nextBlock, state.stats);
 
       let nextBlock =
-        if (gridState.block === state.nextBlock) {
+        if (next.gridState.block === state.nextBlock) {
           Blocks.getRandomBlock();
         } else {
           state.nextBlock;
         };
 
-      if (gameOver) {
+      if (next.gameOver) {
         Js.log("Game over!");
         clearIntervalId(state.timerIds.tick);
-        ReasonReact.NoUpdate;
+        ReasonReact.Update({...state, gameOver: true});
       } else {
-        let nextState = {...state, gridState, stats, nextBlock};
+        let nextState = {
+          ...state,
+          gridState: next.gridState,
+          stats: next.stats,
+          nextBlock
+        };
 
-        if (state.stats.level < stats.level) {
+        if (state.stats.level < next.stats.level) {
           ReasonReact.UpdateWithSideEffects(
             nextState,
             (self => self.send(UpdateLevel)),
