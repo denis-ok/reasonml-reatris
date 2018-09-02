@@ -1,6 +1,7 @@
 open Types;
 
 [@bs.val] external document : Dom.document = "document";
+
 [%bs.raw {|require('./game.css')|}];
 
 let emptyRow = Array.make(10, O);
@@ -276,7 +277,7 @@ let make = _children => {
 
     <div className="game">
       <NextBlock nextBlock started />
-      <div className="grid-container">
+      <div className="gridContainer">
         <Grid grid=gridToRender />
         <Screens screen countdownCounter clickStart=(self.handle(clickStart))/>
       </div>

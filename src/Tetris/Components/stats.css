@@ -1,17 +1,17 @@
-.StatsRow {
+.statsRow {
   font-size: 32px;
   color: #A5AF92;
 }
 
-.StatName {
+.statName {
   font-weight: bold;
 }
 
-.StatValue {
+.statValue {
   font-weight: bold;
 }
 
-.Stats {
+.stats {
   display: flex;
   flex-direction: column;
   justify-content: space-around;

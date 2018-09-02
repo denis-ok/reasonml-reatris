@@ -10,8 +10,8 @@ module Tile = {
     render: _self => {
       let klass =
         switch (cell) {
-        | O => "Cell"
-        | X => "Tile"
+        | O => "cell"
+        | X => "tile"
         };
       <div className=klass />;
     },
@@ -24,7 +24,7 @@ module Row = {
   let make = (~row: row, _children) => {
     ...component,
     render: _self =>
-      <div className="Grid-row">
+      <div className="gridRow">
         (
           row
           |> Array.mapi((i, cell) => <Tile key=(string_of_int(i)) cell />)
@@ -39,7 +39,7 @@ let component = ReasonReact.statelessComponent("Grid");
 let make = (~grid: grid, _children) => {
   ...component,
   render: _self =>
-    <div className="Grid">
+    <div className="grid">
       (
         grid
         |> Array.mapi((i, row) =>

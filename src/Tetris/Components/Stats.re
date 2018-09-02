@@ -1,6 +1,6 @@
 open Types;
 
-[%bs.raw {|require('./Stats.css')|}];
+[%bs.raw {|require('./stats.css')|}];
 
 module StatsRow = {
   let component = ReasonReact.statelessComponent("StatsRow");
@@ -8,9 +8,9 @@ module StatsRow = {
   let make = (~name: string, ~value: int, _children) => {
     ...component,
     render: _self =>
-      <div className="StatsRow">
-        <p className="StatName"> (ReasonReact.string(name)) </p>
-        <p className="StatValue">
+      <div className="statsRow">
+        <p className="statName"> (ReasonReact.string(name)) </p>
+        <p className="statValue">
           (ReasonReact.string(string_of_int(value)))
         </p>
       </div>,
@@ -22,10 +22,10 @@ module StatsRow = {
   let make = (~stats: stats, ~started, _children) => {
     ...component,
     render: _self =>
-      <div className="side-container">
+      <div className="sideContainer">
         (
           if (started) {
-            <div className="Stats">
+            <div className="stats">
               <StatsRow name="Score" value=stats.score />
               <StatsRow name="Lines" value=stats.lines />
               <StatsRow name="Level" value=stats.level />

@@ -1,31 +1,31 @@
-.Grid {
+.grid {
   padding: 4px;
   background: rgb(100, 100, 100);
   width: auto;
 }
 
-.Grid-row {
+.gridRow {
   display: flex;
   justify-content: center;
 }
 
-.Tile {
+.tile {
   width: 40px;
   height: 40px;
   border: solid 1px #687259;
   background: rgb(20, 20, 20)
 }
-.Tile:hover {
+.tile:hover {
   background-color: #484d52;
 }
 
-.Cell {
+.cell {
   width: 40px;
   height: 40px;
   border: solid 1px #687259;
   background: #A5AF92;
 }
 
-.Cell:hover {
+.cell:hover {
   background-color: #484d52;
 }
