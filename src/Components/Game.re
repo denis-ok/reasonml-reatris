@@ -73,7 +73,6 @@ let getNextScreen = (currentScreen) => {
 type self = ReasonReact.self(state, ReasonReact.noRetainedProps, action);
 
 let keyDownToAction = (event, self: self) => {
-  Js.log("KeyDown!")
   let key = event |> Webapi.Dom.KeyboardEvent.key;
   let repeated = event |> Webapi.Dom.KeyboardEvent.repeat;
 
@@ -126,6 +125,10 @@ let keyUpToAction = (event, self: self) => {
   | "ArrowDown" =>
     let timerId = self.state.timerIds.tick;
     clearIntervalId(timerId);
+
+    let delay = Functions.calcDelay(self.state.stats.level);
+    let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
+    timerId := Some(intervalId);
   | _ => ()
   };
 };
@@ -134,7 +137,7 @@ let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
 let addKeyUpEventListener = Webapi.Dom.Document.addKeyUpEventListener;
 
 let removeKeyDownEventListener = Webapi.Dom.Document.removeKeyDownEventListener;
-let removeKeyUpEventListener = Webapi.Dom.Document.removeKeyDownEventListener;
+let removeKeyUpEventListener = Webapi.Dom.Document.removeKeyUpEventListener;
 
 
 let component = ReasonReact.reducerComponent("Game");
