@@ -1,0 +1,31 @@
+.Grid {
+  padding: 4px;
+  background: rgb(100, 100, 100);
+  width: auto;
+}
+
+.Grid-row {
+  display: flex;
+  justify-content: center;
+}
+
+.Tile {
+  width: 40px;
+  height: 40px;
+  border: solid 1px #687259;
+  background: rgb(20, 20, 20)
+}
+.Tile:hover {
+  background-color: #484d52;
+}
+
+.Cell {
+  width: 40px;
+  height: 40px;
+  border: solid 1px #687259;
+  background: #A5AF92;
+}
+
+.Cell:hover {
+  background-color: #484d52;
+}

@@ -156,18 +156,27 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   }
 };
 
-let tick = (gridState, nextBlock, stats) => {
-  let {blockPosition, block, grid} = gridState;
+let tick = (gridState : gridState, stats: stats, ~nextBlock=?, ()) => {
+  let {blockPosition, block, grid} : gridState = gridState;
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
 
   let canMap = canMapBlock(nextPosition, block, grid);
 
-  if (canMap) {
-    let nextStats = calcNextStats(~stats=stats, ~strokesCount=0);
-    let nextGridState = {block, blockPosition: nextPosition, grid};
+  let nextBlock = switch nextBlock {
+    | Some(block) => block
+    | None => Blocks.getRandomBlock()
+    };
 
-    { gridState: nextGridState, stats: nextStats, gameOver: false};
+  if (canMap) {
+    let nextStats = calcNextStats(~stats, ~strokesCount=0);
+    let nextGridState : gridState = {...gridState, blockPosition: nextPosition};
+
+    { gridState: nextGridState,
+      stats: nextStats,
+      gameOver: false,
+      nextBlockToShow: nextBlock
+    };
   } else {
     let nextGrid =  mapBlockToGrid({blockPosition, block, grid});
     let strokeIndexes = getStrokeIndexes(nextGrid);
@@ -187,7 +196,11 @@ let tick = (gridState, nextBlock, stats) => {
       y == 3 - blockHeight && ! canMap;
     };
 
-    { gridState: nextGridState, stats: nextStats, gameOver: gameOver };
+    { gridState: nextGridState,
+      stats: nextStats,
+      gameOver: gameOver,
+      nextBlockToShow: Blocks.getRandomBlock()
+    };
   };
 };
 
@@ -198,8 +211,6 @@ let getNextPositionByDirection = (direction, currentPosition) => {
     switch (direction) {
     | Left => {x: x - 1, y}
     | Right => {x: x + 1, y}
-    | Down => {x, y: y + 1}
-    | _ => currentPosition
     };
 
   nextPosition;

@@ -40,7 +40,9 @@ type stats = {
   score: int,
   lines: int,
   level: int
-}
+};
+
+type screen = Title | Counter | Game | Gameover;
 
 type timerIds = {
   tick: intervalId,
@@ -56,14 +58,25 @@ type gameState = {
   gameOver: gameOver
 };
 
+type tickOutput = {
+  gridState: gridState,
+  stats: stats,
+  gameOver: gameOver,
+  nextBlockToShow: block
+};
+
 type globalState = {
   gridState: gridState,
   nextBlock: block,
   countdownCounter: countdownCounter,
   stats: stats,
   timerIds: timerIds,
+  counting: bool,
   started: started,
-  gameOver: gameOver
+  gameOver: gameOver,
+  screen: screen,
+  handleKeyboard: ref(unit => unit),
+  unHandleKeyboard: ref(unit => unit)
 };
 
-type direction = Left | Up | Right | Down | Unknown;
+type direction = Left | Right;

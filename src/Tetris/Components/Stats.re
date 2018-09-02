@@ -17,16 +17,15 @@ module StatsRow = {
   };
 };
 
-module StatsContainer = {
-  let component = ReasonReact.statelessComponent("StatsContainer");
+  let component = ReasonReact.statelessComponent("Stats");
 
   let make = (~stats: stats, ~started, _children) => {
     ...component,
     render: _self =>
-      <div className="Stats">
+      <div className="side-container">
         (
           if (started) {
-            <div className="StatsContainer">
+            <div className="Stats">
               <StatsRow name="Score" value=stats.score />
               <StatsRow name="Lines" value=stats.lines />
               <StatsRow name="Level" value=stats.level />
@@ -37,4 +36,3 @@ module StatsContainer = {
         )
       </div>,
   };
-};

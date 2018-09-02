@@ -1,6 +1,7 @@
 open Types;
 
 [@bs.val] external document : Dom.document = "document";
+[%bs.raw {|require('./game.css')|}];
 
 let emptyRow = Array.make(10, O);
 
@@ -34,8 +35,12 @@ let initGlobalState: globalState = {
   countdownCounter: 0,
   stats: initStats,
   timerIds: initTimerIds,
+  counting: false,
   started: false,
-  gameOver: false
+  gameOver: false,
+  screen: Title,
+  handleKeyboard: ref(() => ()),
+  unHandleKeyboard: ref(() => ()),
 };
 
 let clearIntervalId = (id: intervalId) =>
@@ -55,13 +60,21 @@ type action =
   | RotateBlock
   | UpdateLevel;
 
+let getNextScreen = (currentScreen) => {
+  switch currentScreen {
+  | Title => Counter
+  | Counter => Game
+  | Game => Gameover
+  | Gameover => Counter
+  };
+};
+
 type self = ReasonReact.self(state, ReasonReact.noRetainedProps, action);
 
 let keyDownToAction = (event, self: self) => {
+  Js.log("KeyDown!")
   let key = event |> Webapi.Dom.KeyboardEvent.key;
   let repeated = event |> Webapi.Dom.KeyboardEvent.repeat;
-  let started = self.state.started;
-  let gameOver = self.state.gameOver;
 
   let dropDelay = 30;
   let moveDelay = 50;
@@ -73,7 +86,7 @@ let keyDownToAction = (event, self: self) => {
     timerId := Some(id);
   };
 
-  if (! started || gameOver || repeated) {
+  if (repeated) {
     ();
   } else {
     switch (key) {
@@ -101,32 +114,27 @@ let keyDownToAction = (event, self: self) => {
 let clickStart = (_event, self: self) =>
   self.ReasonReact.send(StartCountdown);
 
+
 let keyUpToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
-  let started = self.state.started;
 
-  if (started) {
-    switch (key) {
-    | "ArrowLeft" => clearIntervalId(self.state.timerIds.moveLeft)
-    | "ArrowRight" => clearIntervalId(self.state.timerIds.moveRight)
-    | "ArrowUp" => clearIntervalId(self.state.timerIds.rotate)
-    | "ArrowDown" =>
-      let delay = Functions.calcDelay(self.state.stats.level);
-      let timerId = self.state.timerIds.tick;
-
-      clearIntervalId(timerId);
-      let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
-      timerId := Some(intervalId);
-
-    | _ => ()
-    };
-  } else {
-    ();
+  switch (key) {
+  | "ArrowLeft" => clearIntervalId(self.state.timerIds.moveLeft)
+  | "ArrowRight" => clearIntervalId(self.state.timerIds.moveRight)
+  | "ArrowUp" => clearIntervalId(self.state.timerIds.rotate)
+  | "ArrowDown" =>
+    let timerId = self.state.timerIds.tick;
+    clearIntervalId(timerId);
+  | _ => ()
   };
 };
 
 let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
 let addKeyUpEventListener = Webapi.Dom.Document.addKeyUpEventListener;
+
+let removeKeyDownEventListener = Webapi.Dom.Document.removeKeyDownEventListener;
+let removeKeyUpEventListener = Webapi.Dom.Document.removeKeyDownEventListener;
+
 
 let component = ReasonReact.reducerComponent("Game");
 
@@ -135,8 +143,25 @@ let make = _children => {
   initialState: () => initGlobalState,
 
   didMount: self => {
-    addKeyDownEventListener(self.handle(keyDownToAction), document);
-    addKeyUpEventListener(self.handle(keyUpToAction), document);
+    let keyDownHandler = self.handle(keyDownToAction);
+    let keyUpHandler = self.handle(keyUpToAction);
+
+    let addKeyboardListeners = () => {
+      addKeyDownEventListener(keyDownHandler, document);
+      addKeyUpEventListener(keyUpHandler, document);
+    };
+
+    let removeKeyboardListeners = () => {
+      removeKeyDownEventListener(keyDownHandler, document);
+      removeKeyUpEventListener(keyUpHandler, document);
+    };
+
+    self.state.handleKeyboard := addKeyboardListeners;
+    self.state.unHandleKeyboard := removeKeyboardListeners;
+
+    self.onUnmount(() => {
+      self.state.unHandleKeyboard^();
+    });
   },
 
   reducer: (action, state) =>
@@ -151,13 +176,14 @@ let make = _children => {
             let timerId = state.timerIds.tick;
             let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
             timerId := Some(intervalId);
+            self.state.handleKeyboard^();
           }
         ),
       );
 
     | StartCountdown =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, countdownCounter: 3},
+        {...initGlobalState, countdownCounter: 3, screen: getNextScreen(state.screen)},
         (
           self => {
             let timerId = state.timerIds.countdown;
@@ -177,7 +203,7 @@ let make = _children => {
         });
       } else {
         ReasonReact.UpdateWithSideEffects(
-          {...state, countdownCounter: 0},
+          {...state, countdownCounter: 0, screen: getNextScreen(state.screen)},
           (
             self => {
               clearIntervalId(state.timerIds.countdown);
@@ -211,25 +237,26 @@ let make = _children => {
       );
 
     | Tick =>
-      let next = Functions.tick(state.gridState, state.nextBlock, state.stats);
+      let next = Functions.tick(state.gridState, state.stats, ~nextBlock=state.nextBlock, ());
 
-      let nextBlock =
-        if (next.gridState.block === state.nextBlock) {
-          Blocks.getRandomBlock();
-        } else {
-          state.nextBlock;
-        };
+      let {gridState, stats, gameOver, nextBlockToShow} = next;
 
-      if (next.gameOver) {
-        Js.log("Game over!");
-        clearIntervalId(state.timerIds.tick);
-        ReasonReact.Update({...state, gameOver: true});
+      if (gameOver) {
+        ReasonReact.UpdateWithSideEffects(
+          {...state, gameOver: true, screen: getNextScreen(state.screen)},
+          (
+            _self => {
+              state.unHandleKeyboard^();
+              clearIntervalId(state.timerIds.tick);
+            }
+          ),
+        );
       } else {
         let nextState = {
           ...state,
-          gridState: next.gridState,
-          stats: next.stats,
-          nextBlock
+          nextBlock: nextBlockToShow,
+          gridState,
+          stats,
         };
 
         if (state.stats.level < next.stats.level) {
@@ -244,18 +271,16 @@ let make = _children => {
     },
 
   render: self => {
-    let {nextBlock, gridState, countdownCounter, stats, started} = self.state;
+    let {nextBlock, gridState, countdownCounter, stats, started, screen} = self.state;
     let gridToRender = started ? Functions.mapBlockToGrid(gridState) : emptyGrid;
 
-    <div className="Game">
-      <Grid.NextBlockArea nextBlock started />
-      <Grid.GameArea
-        grid=gridToRender
-        counter=countdownCounter
-        started
-        clickStart=(self.handle(clickStart))
-      />
-      <Stats.StatsContainer stats started />
+    <div className="game">
+      <NextBlock nextBlock started />
+      <div className="grid-container">
+        <Grid grid=gridToRender />
+        <Screens screen countdownCounter clickStart=(self.handle(clickStart))/>
+      </div>
+      <Stats stats started />
     </div>;
   },
 };

@@ -86,10 +86,11 @@ let () =
         let expected = {
           gridState: gridStateAfter,
           stats: statsAfter,
-          gameOver: false
+          gameOver: false,
+          nextBlockToShow: testBlock
         };
 
-        expect(tick(gridStateBefore, testBlock, statsBefore)) |> toEqual(expected);
+        expect(tick(gridStateBefore, statsBefore, ~nextBlock=testBlock, ())) |> toEqual(expected);
       });
 
       /* test("should return new state after strike", () => {
