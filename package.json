@@ -1,7 +1,9 @@
 {
   "name": "reatris",
-  "description": "Implementation of classic tetris using Reason and ReasonReact",
-  "version": "0.3.0",
+  "description": "Simple implementation of classic tetris game using Reason and ReasonReact",
+  "private": true,
+  "homepage": "https://github.com/denis-ok/reasonml-reatris",
+  "version": "0.3.1",
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
@@ -9,7 +11,8 @@
     "webpack": "webpack",
     "webpack-dev-server": "webpack-dev-server",
     "webpack-serve": "webpack-serve",
-    "jest": "jest"
+    "jest": "jest",
+    "gh-pages": "gh-pages"
   },
   "keywords": [
     "BuckleScript"
@@ -21,9 +24,10 @@
     "bs-platform": "^4.0.5",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
+    "gh-pages": "^1.2.0",
     "html-webpack-plugin": "^3.2.0",
     "style-loader": "^0.22.1",
-    "webpack": "^4.17.1",
+    "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.7",
     "webpack-serve": "^2.0.2"
