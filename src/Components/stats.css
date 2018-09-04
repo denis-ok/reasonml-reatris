@@ -1,15 +1,15 @@
 .statsRow {
-  font-size: 32px;
+  font-size: 34px;
   color: #A5AF92;
 }
 
-.statName {
-  font-weight: bold;
+/* .statName {
+
 }
 
 .statValue {
-  font-weight: bold;
-}
+
+} */
 
 .stats {
   display: flex;

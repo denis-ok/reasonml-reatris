@@ -282,7 +282,7 @@ let make = _children => {
       <NextBlock nextBlock started />
       <div className="gridContainer">
         <Grid grid=gridToRender />
-        <Screens screen countdownCounter clickStart=(self.handle(clickStart))/>
+        <GridOverlay screen countdownCounter clickStart=(self.handle(clickStart))/>
       </div>
       <Stats stats started />
     </div>;

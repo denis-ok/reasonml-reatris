@@ -5,6 +5,7 @@
 
 .gridContainer {
   display: inline-block;
+  position: relative;
 }
 
 .sideContainer {

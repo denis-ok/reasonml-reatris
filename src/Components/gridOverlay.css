@@ -1,0 +1,57 @@
+.grid-overlay {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 0;
+}
+
+.title-heading {
+  position: absolute;
+  top: 46px;
+  padding: 0;
+  margin: 0;
+  font-size: 70px;
+  cursor: default;
+  letter-spacing: 2px;
+}
+
+.btn {
+  position: absolute;
+  top: 339px;
+  margin: 0;
+  padding: 0;
+  width: 250px;
+  height: 82px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #deeacb;
+  border: 2px solid black;
+  cursor: pointer;
+  font-size: 32px;
+}
+
+.btn:hover {
+  background: #546163;
+  cursor: pointer;
+}
+
+.btn:active {
+  background: white;
+  cursor: pointer;
+}
+
+.number {
+  padding: 0;
+  margin: 0;
+  font-size: 340px;
+  cursor: default;
+}
