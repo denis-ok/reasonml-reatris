@@ -25,11 +25,9 @@ module Row = {
     ...component,
     render: _self =>
       <div className="gridRow">
-        (
-          row
-          |> Array.mapi((i, cell) => <Tile key=(string_of_int(i)) cell />)
-          |> ReasonReact.array
-        )
+        {row
+         |> Array.mapi((i, cell) => <Tile key={string_of_int(i)} cell />)
+         |> ReasonReact.array}
       </div>,
   };
 };
@@ -40,12 +38,10 @@ let make = (~grid: grid, _children) => {
   ...component,
   render: _self =>
     <div className="grid">
-      (
-        grid
-        |> Array.mapi((i, row) =>
-             i > 1 ? <Row key=(string_of_int(i)) row /> : ReasonReact.null
-           )
-        |> ReasonReact.array
-      )
+      {grid
+       |> Array.mapi((i, row) =>
+            i > 1 ? <Row key={string_of_int(i)} row /> : ReasonReact.null
+          )
+       |> ReasonReact.array}
     </div>,
 };

@@ -31,52 +31,58 @@ type countdownCounter = int;
 type started = bool;
 
 type gridState = {
-  block : block,
-  blockPosition: blockPosition,
-  grid: grid,
+  block,
+  blockPosition,
+  grid,
 };
 
 type stats = {
   score: int,
   lines: int,
-  level: int
+  level: int,
 };
 
-type screen = Title | Counter | Game | Gameover;
+type screen =
+  | Title
+  | Counter
+  | Game
+  | Gameover;
 
 type timerIds = {
   tick: intervalId,
   countdown: intervalId,
   moveLeft: intervalId,
   moveRight: intervalId,
-  rotate: intervalId
+  rotate: intervalId,
 };
 
 type gameState = {
-  gridState: gridState,
-  stats: stats,
-  gameOver: gameOver
+  gridState,
+  stats,
+  gameOver,
 };
 
 type tickOutput = {
-  gridState: gridState,
-  stats: stats,
-  gameOver: gameOver,
-  nextBlockToShow: block
+  gridState,
+  stats,
+  gameOver,
+  nextBlockToShow: block,
 };
 
 type globalState = {
-  gridState: gridState,
+  gridState,
   nextBlock: block,
-  countdownCounter: countdownCounter,
-  stats: stats,
-  timerIds: timerIds,
+  countdownCounter,
+  stats,
+  timerIds,
   counting: bool,
-  started: started,
-  gameOver: gameOver,
-  screen: screen,
+  started,
+  gameOver,
+  screen,
   handleKeyboard: ref(unit => unit),
-  unHandleKeyboard: ref(unit => unit)
+  unHandleKeyboard: ref(unit => unit),
 };
 
-type direction = Left | Right;
+type direction =
+  | Left
+  | Right;

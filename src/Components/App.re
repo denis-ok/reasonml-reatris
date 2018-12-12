@@ -2,12 +2,8 @@
 
 let component = ReasonReact.statelessComponent("App");
 
-let make = (_children) => {
+let make = _children => {
   ...component,
   render: _self =>
-    <div className="App">
-      <div className="App-header">
-      </div>
-      <Game />
-    </div>,
+    <div className="App"> <div className="App-header" /> <Game /> </div>,
 };

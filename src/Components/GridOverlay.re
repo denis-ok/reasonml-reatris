@@ -9,9 +9,9 @@ module TitleScreen = {
     ...component,
     render: _self =>
       <div className="grid-overlay">
-        <h2 className="title-heading"> (ReasonReact.string("REATRIS")) </h2>
+        <h2 className="title-heading"> {ReasonReact.string("REATRIS")} </h2>
         <div className="btn" onClick=clickStart>
-          <p> (ReasonReact.string("Start Game")) </p>
+          <p> {ReasonReact.string("Start Game")} </p>
         </div>
       </div>,
   };
@@ -25,7 +25,7 @@ module CounterScreen = {
     render: _self =>
       <div className="grid-overlay">
         <p className="number">
-          (ReasonReact.string(string_of_int(countdownCounter)))
+          {ReasonReact.string(string_of_int(countdownCounter))}
         </p>
       </div>,
   };
@@ -39,7 +39,7 @@ module GameoverScreen = {
     render: _self =>
       <div className="grid-overlay">
         <div className="btn" onClick=clickStart>
-          <p> (ReasonReact.string("Play Again?")) </p>
+          <p> {ReasonReact.string("Play Again?")} </p>
         </div>
       </div>,
   };

@@ -112,13 +112,13 @@ let removeFilledRows = (grid: grid, indexes) => {
     let hasIndex = i => Js.Array.includes(i, indexes);
     let emptyRow = Array.make(Array.length(grid[0]), O);
 
-    let filteredGrid = grid |> Js.Array.filteri((_el, i) => ! hasIndex(i));
+    let filteredGrid = grid |> Js.Array.filteri((_el, i) => !hasIndex(i));
 
     filteredGrid |> Array.append(Array.make(indexesCount, emptyRow));
   };
 };
 
-let genInitBlockPosition = (block: block, grid: grid) : blockPosition => {
+let genInitBlockPosition = (block: block, grid: grid): blockPosition => {
   let blockWidth = getWidth(block);
   let blockHeight = getHeight(block);
   let gridWidth = getWidth(grid);
@@ -152,37 +152,43 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   {
     score: newScore,
     lines: lines + strokesCount,
-    level: strokesCount > 0 ? calcLevel(newScore) : level
-  }
+    level: strokesCount > 0 ? calcLevel(newScore) : level,
+  };
 };
 
-let tick = (gridState : gridState, stats: stats, ~nextBlock=?, ()) => {
-  let {blockPosition, block, grid} : gridState = gridState;
+let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
+  let {blockPosition, block, grid}: gridState = gridState;
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
 
   let canMap = canMapBlock(nextPosition, block, grid);
 
-  let nextBlock = switch nextBlock {
+  let nextBlock =
+    switch (nextBlock) {
     | Some(block) => block
     | None => Blocks.getRandomBlock()
     };
 
   if (canMap) {
     let nextStats = calcNextStats(~stats, ~strokesCount=0);
-    let nextGridState : gridState = {...gridState, blockPosition: nextPosition};
+    let nextGridState: gridState = {
+      ...gridState,
+      blockPosition: nextPosition,
+    };
 
-    { gridState: nextGridState,
+    {
+      gridState: nextGridState,
       stats: nextStats,
       gameOver: false,
-      nextBlockToShow: nextBlock
+      nextBlockToShow: nextBlock,
     };
   } else {
-    let nextGrid =  mapBlockToGrid({blockPosition, block, grid});
+    let nextGrid = mapBlockToGrid({blockPosition, block, grid});
     let strokeIndexes = getStrokeIndexes(nextGrid);
     let nextGridWithRemovedRows = removeFilledRows(nextGrid, strokeIndexes);
 
-    let nextStats = calcNextStats(~stats=stats, ~strokesCount=Array.length(strokeIndexes));
+    let nextStats =
+      calcNextStats(~stats, ~strokesCount=Array.length(strokeIndexes));
 
     let nextGridState = {
       block: nextBlock,
@@ -193,13 +199,14 @@ let tick = (gridState : gridState, stats: stats, ~nextBlock=?, ()) => {
     let gameOver = {
       let blockHeight = getHeight(nextBlock);
       let {y} = nextPosition;
-      y == 3 - blockHeight && ! canMap;
+      y == 3 - blockHeight && !canMap;
     };
 
-    { gridState: nextGridState,
+    {
+      gridState: nextGridState,
       stats: nextStats,
-      gameOver: gameOver,
-      nextBlockToShow: Blocks.getRandomBlock()
+      gameOver,
+      nextBlockToShow: Blocks.getRandomBlock(),
     };
   };
 };
@@ -246,7 +253,6 @@ let getGridStateAfterRotate = gridState => {
 
   canMap ? {...gridState, block: rotatedBlock} : gridState;
 };
-
 
 let calcDelay = level =>
   switch (level) {
