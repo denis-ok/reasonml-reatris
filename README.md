@@ -10,4 +10,4 @@ then
 `make reason-watch`
 
 In second tab:
-`make webpack-serve`
+`make webpack-dev-server`

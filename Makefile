@@ -20,11 +20,8 @@ test-coverage:
 webpack-watch:
 	npm run webpack -w
 
-webpack-serve:
-	npm run webpack-serve -- --config webpack.config.js --open
-
-# webpack-dev-server:
-# 	npm run webpack-dev-server -- --open --hot
+webpack-dev-server:
+	npm run webpack-dev-server -- --open --hot
 
 webpack-build-dev:
 	npm run webpack
