@@ -1,9 +1,11 @@
+module RR = ReasonReact;
 open Types;
+
 
 [%bs.raw {|require('./grid.css')|}];
 
 module Tile = {
-  let component = ReasonReact.statelessComponent("Tile");
+  let component = RR.statelessComponent("Tile");
 
   let make = (~cell: cell, _children) => {
     ...component,
@@ -19,7 +21,7 @@ module Tile = {
 };
 
 module Row = {
-  let component = ReasonReact.statelessComponent("Row");
+  let component = RR.statelessComponent("Row");
 
   let make = (~row: row, _children) => {
     ...component,
@@ -27,12 +29,12 @@ module Row = {
       <div className="gridRow">
         {row
          |> Array.mapi((i, cell) => <Tile key={string_of_int(i)} cell />)
-         |> ReasonReact.array}
+         |> RR.array}
       </div>,
   };
 };
 
-let component = ReasonReact.statelessComponent("Grid");
+let component = RR.statelessComponent("Grid");
 
 let make = (~grid: grid, _children) => {
   ...component,
@@ -40,8 +42,8 @@ let make = (~grid: grid, _children) => {
     <div className="grid">
       {grid
        |> Array.mapi((i, row) =>
-            i > 1 ? <Row key={string_of_int(i)} row /> : ReasonReact.null
+            i > 1 ? <Row key={string_of_int(i)} row /> : RR.null
           )
-       |> ReasonReact.array}
+       |> RR.array}
     </div>,
 };

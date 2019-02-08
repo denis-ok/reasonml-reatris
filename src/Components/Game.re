@@ -1,3 +1,4 @@
+module RR = ReasonReact;
 open Types;
 
 [@bs.val] external document: Dom.document = "document";
@@ -70,7 +71,7 @@ let getNextScreen = currentScreen => {
   };
 };
 
-type self = ReasonReact.self(state, ReasonReact.noRetainedProps, action);
+type self = RR.self(state, RR.noRetainedProps, action);
 
 let keyDownToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
@@ -83,7 +84,7 @@ let keyDownToAction = (event, self: self) => {
   let setIntervalForAction = (action, timerId, delay) => {
     clearIntervalId(timerId);
     let id =
-      Js.Global.setInterval(() => self.ReasonReact.send(action), delay);
+      Js.Global.setInterval(() => self.RR.send(action), delay);
     timerId := Some(id);
   };
 
@@ -113,7 +114,7 @@ let keyDownToAction = (event, self: self) => {
 };
 
 let clickStart = (_event, self: self) =>
-  self.ReasonReact.send(StartCountdown);
+  self.RR.send(StartCountdown);
 
 let keyUpToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
@@ -139,7 +140,7 @@ let addKeyUpEventListener = Webapi.Dom.Document.addKeyUpEventListener;
 let removeKeyDownEventListener = Webapi.Dom.Document.removeKeyDownEventListener;
 let removeKeyUpEventListener = Webapi.Dom.Document.removeKeyUpEventListener;
 
-let component = ReasonReact.reducerComponent("Game");
+let component = RR.reducerComponent("Game");
 
 let make = _children => {
   ...component,
