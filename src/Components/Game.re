@@ -1,27 +1,14 @@
 module RR = ReasonReact;
+module Func = Functions;
 open Types;
 
 [@bs.val] external document: Dom.document = "document";
 
 [%bs.raw {|require('./game.css')|}];
 
-let emptyRow = Array.make(10, O);
-
-let emptyGrid = Array.make(22, emptyRow);
-
-let firstBlock = Blocks.getRandomBlock();
-
-let firstNextBlock = Blocks.getRandomBlock();
-
-let initBlockPosition = Functions.genInitBlockPosition(firstBlock, emptyGrid);
-
 let initStats = {score: 0, lines: 0, level: 1};
 
-let initGridState = {
-  block: firstBlock,
-  blockPosition: initBlockPosition,
-  grid: emptyGrid,
-};
+let initGridState = Func.genInitGridState(~gridWidth=10, ~gridHeight=22);
 
 let initTimerIds = {
   tick: ref(None),
@@ -33,7 +20,7 @@ let initTimerIds = {
 
 let initGlobalState: globalState = {
   gridState: initGridState,
-  nextBlock: firstNextBlock,
+  nextBlock: Blocks.getRandomBlock(),
   countdownCounter: 0,
   stats: initStats,
   timerIds: initTimerIds,
@@ -83,8 +70,7 @@ let keyDownToAction = (event, self: self) => {
 
   let setIntervalForAction = (action, timerId, delay) => {
     clearIntervalId(timerId);
-    let id =
-      Js.Global.setInterval(() => self.RR.send(action), delay);
+    let id = Js.Global.setInterval(() => self.RR.send(action), delay);
     timerId := Some(id);
   };
 
@@ -113,8 +99,7 @@ let keyDownToAction = (event, self: self) => {
   };
 };
 
-let clickStart = (_event, self: self) =>
-  self.RR.send(StartCountdown);
+let clickStart = (_event, self: self) => self.RR.send(StartCountdown);
 
 let keyUpToAction = (event, self: self) => {
   let key = event |> Webapi.Dom.KeyboardEvent.key;
@@ -127,7 +112,7 @@ let keyUpToAction = (event, self: self) => {
     let timerId = self.state.timerIds.tick;
     clearIntervalId(timerId);
 
-    let delay = Functions.calcDelay(self.state.stats.level);
+    let delay = Func.calcDelay(self.state.stats.level);
     let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
     timerId := Some(intervalId);
   | _ => ()
@@ -169,7 +154,7 @@ let make = _children => {
   reducer: (action, state) =>
     switch (action) {
     | StartGame =>
-      let delay = Functions.calcDelay(state.stats.level);
+      let delay = Func.calcDelay(state.stats.level);
 
       UpdateWithSideEffects(
         {...state, started: true},
@@ -201,10 +186,7 @@ let make = _children => {
       let counter = state.countdownCounter;
 
       if (counter > 1) {
-        Update({
-          ...state,
-          countdownCounter: state.countdownCounter - 1,
-        });
+        Update({...state, countdownCounter: state.countdownCounter - 1});
       } else {
         UpdateWithSideEffects(
           {
@@ -222,18 +204,17 @@ let make = _children => {
     | MoveBlock(direction) =>
       Update({
         ...state,
-        gridState:
-          Functions.getGridStateAfterMove(direction, state.gridState),
+        gridState: Func.getGridStateAfterMove(direction, state.gridState),
       })
 
     | RotateBlock =>
       Update({
         ...state,
-        gridState: Functions.getGridStateAfterRotate(state.gridState),
+        gridState: Func.getGridStateAfterRotate(state.gridState),
       })
 
     | UpdateLevel =>
-      let delay = Functions.calcDelay(state.stats.level);
+      let delay = Func.calcDelay(state.stats.level);
       let tickId = state.timerIds.tick;
       clearIntervalId(tickId);
 
@@ -247,7 +228,7 @@ let make = _children => {
 
     | Tick =>
       let next =
-        Functions.tick(
+        Func.tick(
           state.gridState,
           state.stats,
           ~nextBlock=state.nextBlock,
@@ -273,10 +254,7 @@ let make = _children => {
         };
 
         if (state.stats.level < next.stats.level) {
-          UpdateWithSideEffects(
-            nextState,
-            self => self.send(UpdateLevel),
-          );
+          UpdateWithSideEffects(nextState, self => self.send(UpdateLevel));
         } else {
           Update(nextState);
         };
@@ -287,7 +265,7 @@ let make = _children => {
     let {nextBlock, gridState, countdownCounter, stats, started, screen} =
       self.state;
     let gridToRender =
-      started ? Functions.mapBlockToGrid(gridState) : emptyGrid;
+      started ? Func.mapBlockToGrid(gridState) : initGridState.grid;
 
     <div className="game">
       <NextBlock nextBlock started />

@@ -118,16 +118,25 @@ let removeFilledRows = (grid: grid, indexes) => {
   };
 };
 
-let genInitBlockPosition = (block: block, grid: grid): blockPosition => {
+let genInitBlockPosition = (~block: block, ~gridWidth: int): blockPosition => {
   let blockWidth = getWidth(block);
   let blockHeight = getHeight(block);
-  let gridWidth = getWidth(grid);
 
   let posX = Random.int(gridWidth - blockWidth);
   let posY = 3 - blockHeight;
 
   let position = {x: posX, y: posY};
   position;
+};
+
+let genInitGridState = (~gridWidth: int, ~gridHeight: int): gridState => {
+  let emptyRow = Array.make(gridWidth, O);
+  let emptyGrid = Array.make(gridHeight, emptyRow);
+
+  let firstBlock = Blocks.getRandomBlock();
+  let initBlockPosition = genInitBlockPosition(~block=firstBlock, ~gridWidth);
+
+  {block: firstBlock, blockPosition: initBlockPosition, grid: emptyGrid};
 };
 
 let calcLevel = score => {
@@ -192,7 +201,8 @@ let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
 
     let nextGridState = {
       block: nextBlock,
-      blockPosition: genInitBlockPosition(nextBlock, grid),
+      blockPosition:
+        genInitBlockPosition(~block=nextBlock, ~gridWidth=getWidth(grid)),
       grid: nextGridWithRemovedRows,
     };
 
