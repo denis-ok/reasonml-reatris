@@ -32,7 +32,7 @@ module.exports = {
     }]
   },
   plugins: [
-    new CleanWebpackPlugin(["build"]),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src/index.html"),
     }),
