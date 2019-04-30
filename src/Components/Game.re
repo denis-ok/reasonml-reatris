@@ -1,12 +1,12 @@
 module RR = ReasonReact;
 module Func = Functions;
+module Document = Webapi.Dom.Document;
+module Const = Constants;
 open Types;
 
 [@bs.val] external document: Dom.document = "document";
 
 [%bs.raw {|require('./game.css')|}];
-
-let initStats = {score: 0, lines: 0, level: 1};
 
 let initGridState = Func.genInitGridState(~gridWidth=10, ~gridHeight=22);
 
@@ -22,7 +22,7 @@ let initGlobalState: globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
   countdownCounter: 0,
-  stats: initStats,
+  stats: Const.initStats,
   timerIds: initTimerIds,
   counting: false,
   started: false,
@@ -31,12 +31,6 @@ let initGlobalState: globalState = {
   handleKeyboard: ref(() => ()),
   unHandleKeyboard: ref(() => ()),
 };
-
-let clearIntervalId = (id: intervalId) =>
-  switch (id^) {
-  | Some(id) => Js.Global.clearInterval(id)
-  | None => ()
-  };
 
 type state = globalState;
 
@@ -61,15 +55,11 @@ let getNextScreen = currentScreen => {
 type self = RR.self(state, RR.noRetainedProps, action);
 
 let keyDownToAction = (event, self: self) => {
-  let key = event |> Webapi.Dom.KeyboardEvent.key;
-  let repeated = event |> Webapi.Dom.KeyboardEvent.repeat;
-
-  let dropDelay = 30;
-  let moveDelay = 50;
-  let rotateDelay = 90;
+  let key = Utils.Dom.getKeyName(event);
+  let repeated = Utils.Dom.isKeyRepeated(event);
 
   let setIntervalForAction = (action, timerId, delay) => {
-    clearIntervalId(timerId);
+    Utils.clearIntervalId(timerId);
     let id = Js.Global.setInterval(() => self.RR.send(action), delay);
     timerId := Some(id);
   };
@@ -80,19 +70,19 @@ let keyDownToAction = (event, self: self) => {
     switch (key) {
     | "ArrowDown" =>
       let tickId = self.state.timerIds.tick;
-      setIntervalForAction(Tick, tickId, dropDelay);
+      setIntervalForAction(Tick, tickId, Const.dropDelay);
 
     | "ArrowLeft" =>
       let moveLeftId = self.state.timerIds.moveLeft;
-      setIntervalForAction(MoveBlock(Left), moveLeftId, moveDelay);
+      setIntervalForAction(MoveBlock(Left), moveLeftId, Const.moveDelay);
 
     | "ArrowRight" =>
       let moveRightId = self.state.timerIds.moveRight;
-      setIntervalForAction(MoveBlock(Right), moveRightId, moveDelay);
+      setIntervalForAction(MoveBlock(Right), moveRightId, Const.moveDelay);
 
     | "ArrowUp" =>
       let rotateId = self.state.timerIds.rotate;
-      setIntervalForAction(RotateBlock, rotateId, rotateDelay);
+      setIntervalForAction(RotateBlock, rotateId, Const.rotateDelay);
 
     | _ => ()
     };
@@ -102,15 +92,15 @@ let keyDownToAction = (event, self: self) => {
 let clickStart = (_event, self: self) => self.RR.send(StartCountdown);
 
 let keyUpToAction = (event, self: self) => {
-  let key = event |> Webapi.Dom.KeyboardEvent.key;
+  let key = Utils.Dom.getKeyName(event);
 
   switch (key) {
-  | "ArrowLeft" => clearIntervalId(self.state.timerIds.moveLeft)
-  | "ArrowRight" => clearIntervalId(self.state.timerIds.moveRight)
-  | "ArrowUp" => clearIntervalId(self.state.timerIds.rotate)
+  | "ArrowLeft" => Utils.clearIntervalId(self.state.timerIds.moveLeft)
+  | "ArrowRight" => Utils.clearIntervalId(self.state.timerIds.moveRight)
+  | "ArrowUp" => Utils.clearIntervalId(self.state.timerIds.rotate)
   | "ArrowDown" =>
     let timerId = self.state.timerIds.tick;
-    clearIntervalId(timerId);
+    Utils.clearIntervalId(timerId);
 
     let delay = Func.calcDelay(self.state.stats.level);
     let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
@@ -118,12 +108,6 @@ let keyUpToAction = (event, self: self) => {
   | _ => ()
   };
 };
-
-let addKeyDownEventListener = Webapi.Dom.Document.addKeyDownEventListener;
-let addKeyUpEventListener = Webapi.Dom.Document.addKeyUpEventListener;
-
-let removeKeyDownEventListener = Webapi.Dom.Document.removeKeyDownEventListener;
-let removeKeyUpEventListener = Webapi.Dom.Document.removeKeyUpEventListener;
 
 let component = RR.reducerComponent("Game");
 
@@ -136,13 +120,13 @@ let make = _children => {
     let keyUpHandler = self.handle(keyUpToAction);
 
     let addKeyboardListeners = () => {
-      addKeyDownEventListener(keyDownHandler, document);
-      addKeyUpEventListener(keyUpHandler, document);
+      Document.addKeyDownEventListener(keyDownHandler, document);
+      Document.addKeyUpEventListener(keyUpHandler, document);
     };
 
     let removeKeyboardListeners = () => {
-      removeKeyDownEventListener(keyDownHandler, document);
-      removeKeyUpEventListener(keyUpHandler, document);
+      Document.removeKeyDownEventListener(keyDownHandler, document);
+      Document.removeKeyUpEventListener(keyUpHandler, document);
     };
 
     self.state.handleKeyboard := addKeyboardListeners;
@@ -195,7 +179,7 @@ let make = _children => {
             screen: getNextScreen(state.screen),
           },
           self => {
-            clearIntervalId(state.timerIds.countdown);
+            Utils.clearIntervalId(state.timerIds.countdown);
             self.send(StartGame);
           },
         );
@@ -216,7 +200,7 @@ let make = _children => {
     | UpdateLevel =>
       let delay = Func.calcDelay(state.stats.level);
       let tickId = state.timerIds.tick;
-      clearIntervalId(tickId);
+      Utils.clearIntervalId(tickId);
 
       SideEffects(
         self => {
@@ -242,7 +226,7 @@ let make = _children => {
           {...state, gameOver: true, screen: getNextScreen(state.screen)},
           _self => {
             state.unHandleKeyboard^();
-            clearIntervalId(state.timerIds.tick);
+            Utils.clearIntervalId(state.timerIds.tick);
           },
         );
       } else {
