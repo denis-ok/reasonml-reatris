@@ -89,8 +89,6 @@ let keyDownToAction = (event, self: self) => {
   };
 };
 
-let clickStart = (_event, self: self) => self.RR.send(StartCountdown);
-
 let keyUpToAction = (event, self: self) => {
   let key = Utils.Dom.getKeyName(event);
 
@@ -245,9 +243,9 @@ let make = _children => {
       };
     },
 
-  render: self => {
-    let {nextBlock, gridState, countdownCounter, stats, started, screen} =
-      self.state;
+  render: ({send, state}) => {
+    let {nextBlock, gridState, countdownCounter, stats, started, screen} = state;
+
     let gridToRender =
       started ? Func.mapBlockToGrid(gridState) : initGridState.grid;
 
@@ -258,7 +256,7 @@ let make = _children => {
         <GridOverlay
           screen
           countdownCounter
-          clickStart={self.handle(clickStart)}
+          clickStart={_event => send(StartCountdown)}
         />
       </div>
       <Stats stats started />
