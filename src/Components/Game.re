@@ -52,70 +52,66 @@ let getNextScreen = currentScreen => {
   };
 };
 
-type self = RR.self(state, RR.noRetainedProps, action);
-
-let keyDownToAction = (event, self: self) => {
-  let key = Utils.Dom.getKeyName(event);
-  let repeated = Utils.Dom.isKeyRepeated(event);
-
-  let setIntervalForAction = (action, timerId, delay) => {
-    Utils.clearIntervalId(timerId);
-    let id = Js.Global.setInterval(() => self.RR.send(action), delay);
-    timerId := Some(id);
-  };
-
-  if (repeated) {
-    ();
-  } else {
-    switch (key) {
-    | "ArrowDown" =>
-      let tickId = self.state.timerIds.tick;
-      setIntervalForAction(Tick, tickId, Const.dropDelay);
-
-    | "ArrowLeft" =>
-      let moveLeftId = self.state.timerIds.moveLeft;
-      setIntervalForAction(MoveBlock(Left), moveLeftId, Const.moveDelay);
-
-    | "ArrowRight" =>
-      let moveRightId = self.state.timerIds.moveRight;
-      setIntervalForAction(MoveBlock(Right), moveRightId, Const.moveDelay);
-
-    | "ArrowUp" =>
-      let rotateId = self.state.timerIds.rotate;
-      setIntervalForAction(RotateBlock, rotateId, Const.rotateDelay);
-
-    | _ => ()
-    };
-  };
-};
-
-let keyUpToAction = (event, self: self) => {
-  let key = Utils.Dom.getKeyName(event);
-
-  switch (key) {
-  | "ArrowLeft" => Utils.clearIntervalId(self.state.timerIds.moveLeft)
-  | "ArrowRight" => Utils.clearIntervalId(self.state.timerIds.moveRight)
-  | "ArrowUp" => Utils.clearIntervalId(self.state.timerIds.rotate)
-  | "ArrowDown" =>
-    let timerId = self.state.timerIds.tick;
-    Utils.clearIntervalId(timerId);
-
-    let delay = Func.calcDelay(self.state.stats.level);
-    let intervalId = Js.Global.setInterval(() => self.send(Tick), delay);
-    timerId := Some(intervalId);
-  | _ => ()
-  };
-};
-
 let component = RR.reducerComponent("Game");
 
 let make = _children => {
   ...component,
   initialState: () => initGlobalState,
 
-  didMount: self => {
-    let keyDownHandler = self.handle(keyDownToAction);
-    let keyUpHandler = self.handle(keyUpToAction);
+  didMount: ({send, state, onUnmount}) => {
+    let {timerIds} = state;
+
+    let setIntervalForAction = (action, timerId, delay) => {
+      Utils.clearIntervalId(timerId);
+      let id = Js.Global.setInterval(() => send(action), delay);
+      timerId := Some(id);
+    };
+
+    let keyDownHandler = event => {
+      let keyRepeated = Utils.Dom.isKeyRepeated(event);
+
+      if (!keyRepeated) {
+        let key = Utils.Dom.getKeyName(event);
+
+        switch (key) {
+        | "ArrowDown" =>
+          let tickId = timerIds.tick;
+          setIntervalForAction(Tick, tickId, Const.dropDelay);
+
+        | "ArrowLeft" =>
+          let moveLeftId = timerIds.moveLeft;
+          setIntervalForAction(MoveBlock(Left), moveLeftId, Const.moveDelay);
+
+        | "ArrowRight" =>
+          let moveRightId = timerIds.moveRight;
+          setIntervalForAction(
+            MoveBlock(Right),
+            moveRightId,
+            Const.moveDelay,
+          );
+
+        | "ArrowUp" =>
+          let rotateId = timerIds.rotate;
+          setIntervalForAction(RotateBlock, rotateId, Const.rotateDelay);
+
+        | _ => ()
+        };
+      };
+    };
+
+    let keyUpHandler = event => {
+      let key = Utils.Dom.getKeyName(event);
+
+      switch (key) {
+      | "ArrowLeft" => Utils.clearIntervalId(timerIds.moveLeft)
+      | "ArrowRight" => Utils.clearIntervalId(timerIds.moveRight)
+      | "ArrowUp" => Utils.clearIntervalId(timerIds.rotate)
+      | "ArrowDown" =>
+        let delay = Func.calcDelay(state.stats.level);
+        setIntervalForAction(Tick, timerIds.tick, delay);
+      | _ => ()
+      };
+    };
 
     let addKeyboardListeners = () => {
       Document.addKeyDownEventListener(keyDownHandler, document);
@@ -127,10 +123,10 @@ let make = _children => {
       Document.removeKeyUpEventListener(keyUpHandler, document);
     };
 
-    self.state.handleKeyboard := addKeyboardListeners;
-    self.state.unHandleKeyboard := removeKeyboardListeners;
+    state.handleKeyboard := addKeyboardListeners;
+    state.unHandleKeyboard := removeKeyboardListeners;
 
-    self.onUnmount(() => self.state.unHandleKeyboard^());
+    onUnmount(() => state.unHandleKeyboard^());
   },
 
   reducer: (action, state) =>
