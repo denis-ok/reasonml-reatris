@@ -248,7 +248,7 @@ let make = _children => {
     <div className="game">
       <NextBlock nextBlock started />
       <div className="gridContainer">
-        <Grid grid=gridToRender />
+        <Grid.Jsx2 grid=gridToRender />
         <GridOverlay
           screen
           countdownCounter
