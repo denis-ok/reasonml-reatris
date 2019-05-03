@@ -255,7 +255,7 @@ let make = _children => {
           clickStart={_event => send(StartCountdown)}
         />
       </div>
-      <Stats stats started />
+      <Stats.Jsx2 stats started />
     </div>;
   },
 };
