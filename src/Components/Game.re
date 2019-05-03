@@ -249,7 +249,7 @@ let make = _children => {
       <NextBlock nextBlock started />
       <div className="gridContainer">
         <Grid.Jsx2 grid=gridToRender />
-        <GridOverlay
+        <GridOverlay.Jsx2
           screen
           countdownCounter
           clickStart={_event => send(StartCountdown)}
