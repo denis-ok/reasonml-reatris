@@ -246,7 +246,7 @@ let make = _children => {
       started ? Func.mapBlockToGrid(gridState) : initGridState.grid;
 
     <div className="game">
-      <NextBlock nextBlock started />
+      <NextBlock.Jsx2 nextBlock started />
       <div className="gridContainer">
         <Grid.Jsx2 grid=gridToRender />
         <GridOverlay.Jsx2
