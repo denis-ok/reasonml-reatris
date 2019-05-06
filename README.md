@@ -7,7 +7,4 @@ ___
 Start locally:
 `npm install`
 then
-`make reason-watch`
-
-In second tab:
-`make webpack-dev-server`
+`npm start`
