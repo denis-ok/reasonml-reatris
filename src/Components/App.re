@@ -1,9 +1,7 @@
+[@bs.config {jsx: 3}];
+
 [%bs.raw {|require('./App.css')|}];
 
-let component = ReasonReact.statelessComponent("App");
-
-let make = _children => {
-  ...component,
-  render: _self =>
-    <div className="App"> <div className="App-header" /> <Game /> </div>,
-};
+[@react.component]
+let make = () =>
+  <div className="App"> <div className="App-header" /> <Game /> </div>;
