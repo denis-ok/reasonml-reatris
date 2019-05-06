@@ -28,8 +28,6 @@ type countdownId = ref(option(Js.Global.intervalId));
 
 type countdownCounter = int;
 
-type started = bool;
-
 type gridState = {
   block,
   blockPosition,
@@ -72,15 +70,8 @@ type tickOutput = {
 type globalState = {
   gridState,
   nextBlock: block,
-  countdownCounter,
   stats,
-  timerIds,
-  counting: bool,
-  started,
   gameOver,
-  screen,
-  handleKeyboard: ref(unit => unit),
-  unHandleKeyboard: ref(unit => unit),
 };
 
 type direction =

@@ -12,38 +12,14 @@ open Types;
 
 let initGridState = Func.genInitGridState(~gridWidth=10, ~gridHeight=22);
 
-let initTimerIds = {
-  tick: ref(None),
-  countdown: ref(None),
-  moveLeft: ref(None),
-  moveRight: ref(None),
-  rotate: ref(None),
-};
-
 let initGlobalState: globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
-  countdownCounter: 0,
   stats: Const.initStats,
-  timerIds: initTimerIds,
-  counting: false,
-  started: false,
   gameOver: false,
-  screen: Title,
-  handleKeyboard: ref(() => ()),
-  unHandleKeyboard: ref(() => ()),
 };
 
 type state = globalState;
-
-type action =
-  | StartGame
-  | StartCountdown
-  | Countdown
-  | Tick
-  | MoveBlock(direction)
-  | RotateBlock
-  | UpdateLevel;
 
 let getNextScreen = currentScreen => {
   switch (currentScreen) {
@@ -53,8 +29,6 @@ let getNextScreen = currentScreen => {
   | Gameover => Counter
   };
 };
-
-type timerState = timerIds;
 
 let initTimerIds = {
   tick: ref(None),
@@ -67,8 +41,6 @@ let initTimerIds = {
 [@react.component]
 let make = () => {
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-  // let (level, setLevel) = React.useState(() => 1);
-  let (started, setStarted) = React.useState(() => false);
   let (screen, setScreen) = React.useState(() => Title);
   let (countdownCounter, setCountdownCounter) = React.useState(() => 0);
   let (state, setState) = React.useState(() => initGlobalState);
@@ -114,7 +86,7 @@ let make = () => {
       if (gameOver) {
         clearAllTimers();
         setScreen(_ => Gameover);
-        {...state, gameOver: true, screen: Gameover};
+        {...state, gameOver: true};
       } else {
         let nextState = {
           ...state,
@@ -146,11 +118,20 @@ let make = () => {
 
       switch (key) {
       | "ArrowLeft" =>
-        updateTimer(timers.moveLeft, () => moveBlock(Left), 40)
+        updateTimer(
+          timers.moveLeft,
+          () => moveBlock(Left),
+          Constants.moveDelay,
+        )
       | "ArrowRight" =>
-        updateTimer(timers.moveRight, () => moveBlock(Right), 40)
-      | "ArrowUp" => updateTimer(timers.rotate, rotateBlock, 100)
-      | "ArrowDown" => updateTimer(timers.tick, tick, 20)
+        updateTimer(
+          timers.moveRight,
+          () => moveBlock(Right),
+          Constants.moveDelay,
+        )
+      | "ArrowUp" =>
+        updateTimer(timers.rotate, rotateBlock, Constants.rotateDelay)
+      | "ArrowDown" => updateTimer(timers.tick, tick, Constants.dropDelay)
       | _ => ()
       };
     };
@@ -164,7 +145,6 @@ let make = () => {
     | "ArrowRight" => Utils.clearIntervalId(timers.moveRight)
     | "ArrowUp" => Utils.clearIntervalId(timers.rotate)
     | "ArrowDown" =>
-      Js.log("Remove arrowdown timer");
       let delay = Func.calcDelay(state.stats.level);
       updateTimer(timers.tick, tick, delay);
     | _ => ()
@@ -181,10 +161,7 @@ let make = () => {
     Document.removeKeyUpEventListener(keyUpHandler, document);
   };
 
-  let startGame = () => {
-    setScreen(_ => getNextScreen(screen));
-    setStarted(_ => true);
-  };
+  let startGame = () => setScreen(_ => getNextScreen(screen));
 
   React.useEffect(() => {
     if (screen == Counter) {
@@ -193,7 +170,7 @@ let make = () => {
           Js.Global.setInterval(
             () =>
               setCountdownCounter(countdownCounter => countdownCounter - 1),
-            1000,
+            Constants.countDelay,
           );
         timers.countdown := Some(timerId);
       } else {
@@ -206,36 +183,19 @@ let make = () => {
     Some(() => Utils.clearIntervalId(timers.countdown));
   });
 
-  React.useEffect0(() =>
-    Some(
-      () => {
-        removeKeyboardListeners();
-        clearAllTimers();
-      },
-    )
-  );
-
-  // Use Keyboard
   React.useEffect1(
     () => {
       if (screen == Game) {
-        Js.log("Add keyboard listeners");
         addKeyboardListeners();
       };
 
-      Some(
-        () => {
-          Js.log("Remove keyboard listeners");
-          removeKeyboardListeners();
-        },
-      );
+      Some(() => removeKeyboardListeners());
     },
     [|screen|],
   );
 
   let startCountdown = () => {
     setState(_ => initGlobalState);
-    setStarted(_ => false);
     setCountdownCounter(_ => 3);
     setScreen(_ => getNextScreen(screen));
   };
@@ -245,29 +205,22 @@ let make = () => {
     () => {
       switch (screen) {
       | Game =>
-        Js.log("Setting up tick interval!");
         let delay = Func.calcDelay(state.stats.level);
-        Js.log2("Delay: ", delay);
         updateTimer(timers.tick, tick, delay);
       | _ => ()
       };
-      Some(
-        () => {
-          Js.log("Clearing tick interval!");
-          Utils.clearIntervalId(timers.tick);
-        },
-      );
+      Some(() => Utils.clearIntervalId(timers.tick));
     },
-    (started, state.stats.level),
+    (screen, state.stats.level),
   );
 
-  let {nextBlock, gridState, stats} = state;
+  let started = screen == Game || screen == Gameover;
 
   let gridToRender =
-    started ? Func.mapBlockToGrid(gridState) : initGridState.grid;
+    started ? Func.mapBlockToGrid(state.gridState) : initGridState.grid;
 
   <div className="game">
-    <NextBlock nextBlock started />
+    <NextBlock nextBlock={state.nextBlock} started />
     <div className="gridContainer">
       <Grid grid=gridToRender />
       <GridOverlay
@@ -276,6 +229,6 @@ let make = () => {
         clickStart={_event => startCountdown()}
       />
     </div>
-    <Stats stats started />
+    <Stats stats={state.stats} started />
   </div>;
 };
