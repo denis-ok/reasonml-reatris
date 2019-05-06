@@ -1,8 +1,10 @@
+start:
+	npm start
+
 reason-watch:
-	npm run start
+	npm run reason-watch
 
 reason-build:
-	npm run clean
 	npm run build
 
 reason-clean:
@@ -17,12 +19,6 @@ test-watch:
 test-coverage:
 	npm run jest -- --coverage
 
-webpack-watch:
-	npm run webpack -w
-
-webpack-dev-server:
-	npm run webpack-dev-server -- --open --hot
-
 webpack-build-dev:
 	npm run webpack
 
@@ -30,8 +26,7 @@ webpack-build-prod:
 	NODE_ENV=production npm run webpack
 
 predeploy:
-	make reason-build
-	make webpack-build-prod
+	npm run build && make webpack-build-prod
 
 deploy:
-	npm run gh-pages -- -d build
+	make predeploy && npm run gh-pages -- -d build
