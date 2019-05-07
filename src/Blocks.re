@@ -5,7 +5,7 @@ Random.init(int_of_float(Js.Date.now()));
 let getRandomElemIndex = arr => Random.int(Array.length(arr));
 let getRandomElemFromArr = arr => arr[getRandomElemIndex(arr)];
 
-let mirror = block  => block |> Array.map(row => Belt.Array.reverse(row));
+let mirror = block  => block -> Belt.Array.map(row => Belt.Array.reverse(row));
 
 let blockT : block =
 [|

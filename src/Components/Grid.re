@@ -20,8 +20,10 @@ module Row = {
   let make = (~row: row) => {
     <div className="gridRow">
       {row
-       |> Array.mapi((i, cell) => <Tile key={string_of_int(i)} cell />)
-       |> React.array}
+       ->Belt.Array.mapWithIndex((i, cell) =>
+           <Tile key={string_of_int(i)} cell />
+         )
+       ->React.array}
     </div>;
   };
 };
@@ -30,9 +32,9 @@ module Row = {
 let make = (~grid: grid) => {
   <div className="grid">
     {grid
-     |> Array.mapi((i, row) =>
-          i > 1 ? <Row key={string_of_int(i)} row /> : React.null
-        )
-     |> React.array}
+     ->Belt.Array.mapWithIndex((i, row) =>
+         i > 1 ? <Row key={string_of_int(i)} row /> : React.null
+       )
+     ->React.array}
   </div>;
 };

@@ -6,8 +6,10 @@ let make = (~nextBlock: grid, ~started) => {
     {if (started) {
        <div>
          {nextBlock
-          |> Array.mapi((i, row) => <Grid.Row key={string_of_int(i)} row />)
-          |> React.array}
+          ->Belt.Array.mapWithIndex((i, row) =>
+              <Grid.Row key={string_of_int(i)} row />
+            )
+          ->React.array}
        </div>;
      } else {
        React.null;
