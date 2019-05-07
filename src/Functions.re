@@ -114,12 +114,12 @@ let removeFilledRows = (grid: grid, indexes) => {
   };
 };
 
-let genInitBlockPosition = (~block: block, ~gridWidth: int): blockPosition => {
+let calcInitBlockPosition = (~block: block, ~gridWidth: int): blockPosition => {
   let blockWidth = getWidth(block);
   let blockHeight = getHeight(block);
 
-  let posX = Random.int(gridWidth - blockWidth);
-  let posY = 3 - blockHeight;
+  let posX = gridWidth / 2 - blockWidth / 2;
+  let posY = Constants.hiddenRowsCount - blockHeight;
 
   let position = {x: posX, y: posY};
   position;
@@ -130,7 +130,7 @@ let genInitGridState = (~gridWidth: int, ~gridHeight: int): gridState => {
   let emptyGrid = Array.make(gridHeight, emptyRow);
 
   let firstBlock = Blocks.getRandomBlock();
-  let initBlockPosition = genInitBlockPosition(~block=firstBlock, ~gridWidth);
+  let initBlockPosition = calcInitBlockPosition(~block=firstBlock, ~gridWidth);
 
   {block: firstBlock, blockPosition: initBlockPosition, grid: emptyGrid};
 };
@@ -198,7 +198,7 @@ let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
     let nextGridState = {
       block: nextBlock,
       blockPosition:
-        genInitBlockPosition(~block=nextBlock, ~gridWidth=getWidth(grid)),
+        calcInitBlockPosition(~block=nextBlock, ~gridWidth=getWidth(grid)),
       grid: nextGridWithRemovedRows,
     };
 
