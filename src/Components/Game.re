@@ -1,6 +1,5 @@
 module RR = ReasonReact;
 module Func = Functions;
-module Document = Webapi.Dom.Document;
 module Const = Constants;
 open Types;
 
@@ -149,16 +148,6 @@ let make = () => {
     };
   };
 
-  let addKeyboardListeners = () => {
-    Document.addKeyDownEventListener(keyDownHandler, document);
-    Document.addKeyUpEventListener(keyUpHandler, document);
-  };
-
-  let removeKeyboardListeners = () => {
-    Document.removeKeyDownEventListener(keyDownHandler, document);
-    Document.removeKeyUpEventListener(keyUpHandler, document);
-  };
-
   let startGame = () => setScreen(_ => getNextScreen(screen));
 
   React.useEffect(() => {
@@ -181,14 +170,27 @@ let make = () => {
     Some(() => Utils.clearIntervalId(timers.countdown));
   });
 
+  //Use keyboard
   React.useEffect1(
-    () => {
+    () =>
       if (screen == Game) {
-        addKeyboardListeners();
-      };
+        Utils.Dom.addKeyboardListeners(
+          ~keyDownHandler,
+          ~keyUpHandler,
+          document,
+        );
 
-      Some(() => removeKeyboardListeners());
-    },
+        Some(
+          () =>
+            Utils.Dom.removeKeyboardListeners(
+              ~keyDownHandler,
+              ~keyUpHandler,
+              document,
+            ),
+        );
+      } else {
+        None;
+      },
     [|screen|],
   );
 
