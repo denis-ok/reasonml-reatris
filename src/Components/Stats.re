@@ -1,5 +1,3 @@
-[@bs.config {jsx: 3}];
-
 module RR = ReasonReact;
 open Types;
 
@@ -28,14 +26,4 @@ let make = (~stats: stats, ~started) => {
        RR.null;
      }}
   </div>;
-};
-
-module Jsx2 = {
-  let component = ReasonReact.statelessComponent("Stats");
-  let make = (~stats: stats, ~started, children) =>
-    ReasonReactCompat.wrapReactForReasonReact(
-      make,
-      makeProps(~stats: stats, ~started, ()),
-      children,
-    );
 };

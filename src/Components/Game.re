@@ -1,5 +1,3 @@
-[@bs.config {jsx: 3}];
-
 module RR = ReasonReact;
 module Func = Functions;
 module Document = Webapi.Dom.Document;
