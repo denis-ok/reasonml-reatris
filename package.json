@@ -6,6 +6,7 @@
   "version": "0.4.0",
   "scripts": {
     "build": "bsb -clean-world -make-world",
+    "clean": "bsb -clean-world",
     "start": "npm-run-all -p 'watch' 'webpack-dev-server'",
     "watch": "bsb -clean-world -make-world -w",
     "webpack": "webpack",
@@ -20,7 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.8",
-    "bs-platform": "^5.0.4",
+    "bs-platform": "5.0.3",
     "clean-webpack-plugin": "^2.0.1",
     "css-loader": "^2.1.1",
     "gh-pages": "^2.0.1",
