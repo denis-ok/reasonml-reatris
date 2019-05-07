@@ -1,4 +1,3 @@
-module RR = ReasonReact;
 open Types;
 
 [%bs.raw {|require('./stats.css')|}];
@@ -7,8 +6,8 @@ module StatsRow = {
   [@react.component]
   let make = (~name: string, ~value: int) => {
     <div className="statsRow">
-      <p className="statName"> {RR.string(name)} </p>
-      <p className="statValue"> {RR.string(string_of_int(value))} </p>
+      <p className="statName"> {React.string(name)} </p>
+      <p className="statValue"> {React.string(string_of_int(value))} </p>
     </div>;
   };
 };
@@ -23,7 +22,7 @@ let make = (~stats: stats, ~started) => {
          <StatsRow name="Level" value={stats.level} />
        </div>;
      } else {
-       RR.null;
+       React.null;
      }}
   </div>;
 };

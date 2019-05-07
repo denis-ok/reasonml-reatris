@@ -1,4 +1,3 @@
-module RR = ReasonReact;
 module Func = Functions;
 module Const = Constants;
 open Types;
@@ -115,20 +114,16 @@ let make = () => {
 
       switch (key) {
       | "ArrowLeft" =>
-        updateTimer(
-          timers.moveLeft,
-          () => moveBlock(Left),
-          Constants.moveDelay,
-        )
+        updateTimer(timers.moveLeft, () => moveBlock(Left), Const.moveDelay)
       | "ArrowRight" =>
         updateTimer(
           timers.moveRight,
           () => moveBlock(Right),
-          Constants.moveDelay,
+          Const.moveDelay,
         )
       | "ArrowUp" =>
-        updateTimer(timers.rotate, rotateBlock, Constants.rotateDelay)
-      | "ArrowDown" => updateTimer(timers.tick, tick, Constants.dropDelay)
+        updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
+      | "ArrowDown" => updateTimer(timers.tick, tick, Const.dropDelay)
       | _ => ()
       };
     };
@@ -157,7 +152,7 @@ let make = () => {
           Js.Global.setInterval(
             () =>
               setCountdownCounter(countdownCounter => countdownCounter - 1),
-            Constants.countDelay,
+            Const.countDelay,
           );
         timers.countdown := Some(timerId);
       } else {

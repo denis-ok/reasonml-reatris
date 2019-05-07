@@ -1,4 +1,3 @@
-module RR = ReasonReact;
 open Types;
 
 [%bs.raw {|require('./gridOverlay.css')|}];
@@ -7,9 +6,9 @@ module TitleScreen = {
   [@react.component]
   let make = (~clickStart) => {
     <div className="grid-overlay">
-      <h2 className="title-heading"> {RR.string("REATRIS")} </h2>
+      <h2 className="title-heading"> {React.string("REATRIS")} </h2>
       <div className="btn" onClick=clickStart>
-        <p> {RR.string("Start Game")} </p>
+        <p> {React.string("Start Game")} </p>
       </div>
     </div>;
   };
@@ -20,7 +19,7 @@ module CounterScreen = {
   let make = (~countdownCounter: countdownCounter) => {
     <div className="grid-overlay">
       <p className="number">
-        {RR.string(string_of_int(countdownCounter))}
+        {React.string(string_of_int(countdownCounter))}
       </p>
     </div>;
   };
@@ -31,7 +30,7 @@ module GameoverScreen = {
   let make = (~clickStart) => {
     <div className="grid-overlay">
       <div className="btn" onClick=clickStart>
-        <p> {RR.string("Play Again?")} </p>
+        <p> {React.string("Play Again?")} </p>
       </div>
     </div>;
   };
@@ -42,17 +41,7 @@ let make = (~screen, ~countdownCounter, ~clickStart) => {
   switch (screen) {
   | Title => <TitleScreen clickStart />
   | Counter => <CounterScreen countdownCounter />
-  | Game => RR.null
+  | Game => React.null
   | Gameover => <GameoverScreen clickStart />
   };
-};
-
-module Jsx2 = {
-  let component = ReasonReact.statelessComponent("GridOverlay");
-  let make = (~screen, ~countdownCounter, ~clickStart, children) =>
-    ReasonReactCompat.wrapReactForReasonReact(
-      make,
-      makeProps(~screen, ~countdownCounter, ~clickStart, ()),
-      children,
-    );
 };

@@ -1,4 +1,3 @@
-module RR = ReasonReact;
 open Types;
 
 [%bs.raw {|require('./grid.css')|}];
@@ -22,7 +21,7 @@ module Row = {
     <div className="gridRow">
       {row
        |> Array.mapi((i, cell) => <Tile key={string_of_int(i)} cell />)
-       |> RR.array}
+       |> React.array}
     </div>;
   };
 };
@@ -32,18 +31,8 @@ let make = (~grid: grid) => {
   <div className="grid">
     {grid
      |> Array.mapi((i, row) =>
-          i > 1 ? <Row key={string_of_int(i)} row /> : RR.null
+          i > 1 ? <Row key={string_of_int(i)} row /> : React.null
         )
-     |> RR.array}
+     |> React.array}
   </div>;
-};
-
-module Jsx2 = {
-  let component = ReasonReact.statelessComponent("Grid");
-  let make = (~grid: grid, children) =>
-    ReasonReactCompat.wrapReactForReasonReact(
-      make,
-      makeProps(~grid, ()),
-      children,
-    );
 };
