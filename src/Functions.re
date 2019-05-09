@@ -130,15 +130,13 @@ let genInitGridState = (~gridWidth: int, ~gridHeight: int): gridState => {
   let emptyGrid = Array.make(gridHeight, emptyRow);
 
   let firstBlock = Blocks.getRandomBlock();
-  let initBlockPosition = calcInitBlockPosition(~block=firstBlock, ~gridWidth);
+  let initBlockPosition =
+    calcInitBlockPosition(~block=firstBlock, ~gridWidth);
 
   {block: firstBlock, blockPosition: initBlockPosition, grid: emptyGrid};
 };
 
-let calcLevel = score => {
-  let divided = score / 500;
-  Js.Math.floor(float_of_int(divided)) + 1;
-};
+let calcLevel = score => score / 500 + 1;
 
 let calcNextStats = (~stats: stats, ~strokesCount) => {
   let {score, lines, level} = stats;
@@ -202,16 +200,13 @@ let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
       grid: nextGridWithRemovedRows,
     };
 
-    let gameOver = {
-      let blockHeight = getHeight(nextBlock);
-      let {y} = nextPosition;
-      y == 3 - blockHeight && !canMap;
-    };
+    let canMapNextBlock =
+      canMapBlock(nextGridState.blockPosition, nextBlock, nextGridState.grid);
 
     {
       gridState: nextGridState,
       stats: nextStats,
-      gameOver,
+      gameOver: canMapNextBlock == false,
       nextBlockToShow: Blocks.getRandomBlock(),
     };
   };

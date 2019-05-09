@@ -157,6 +157,10 @@ describe("Tetris basic functions tests", () => {
   });
 });
 
+test("calcLevel", () =>
+  expect(calcLevel(5000)) |> toEqual(11)
+);
+
 // For test coverage
 // Compiler optimizes code and removes this abstractions so functions below not called
 test("getWidth", () => {

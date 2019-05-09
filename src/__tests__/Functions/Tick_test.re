@@ -3,143 +3,159 @@ open Expect;
 open Types;
 open Functions;
 
-let testBlock = [|
-[|X, X, X|],
-[|O, X, O|],
-|];
+let block = [|[|X, X, X|], [|O, X, O|]|];
 
-let testGrid1 =[|
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|X, O, X, X, X, X|],
-|];
+let nextBlock = Blocks.getRandomBlock();
 
-let testGrid2 =[|
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|X, X, X, O, O, O|],
-|];
+test("Simple tick: increment block position and score by 1", () => {
+  let grid = [|
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|X, O, X, X, X, X|],
+  |];
 
-let testGrid3 =[|
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, X, X, X, O, O|],
-[|O, O, X, O, O, O|],
-[|X, O, X, X, X, X|],
-|];
+  let stats = {score: 10, lines: 0, level: 1};
 
-let testGrid4 =[|
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-|];
+  let gridState = {
+    block,
+    blockPosition: {
+      x: 0,
+      y: 3,
+    },
+    grid,
+  };
 
-let testGrid4After =[|
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|O, O, O, O, O, O|],
-[|X, X, X, O, O, O|],
-[|O, X, O, O, O, O|],
-|];
+  let result = tick(gridState, stats, ~nextBlock, ());
 
+  expect(result)
+  |> toEqual({
+       gridState: {
+         block,
+         blockPosition: {
+           x: 0,
+           y: 4,
+         },
+         grid,
+       },
+       stats: {
+         score: 11,
+         lines: 0,
+         level: 1,
+       },
+       gameOver: false,
+       nextBlockToShow: nextBlock,
+     });
+});
 
-let () =
-  describe("Tetris basic functions tests", () => {
-    describe("tick", () => {
+describe("Block placed", () => {
+  let grid = [|
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|X, O, X, X, X, X|],
+  |];
 
-      test("Must update coord only", () => {
-        let statsBefore = {
-          score: 10,
-          lines: 0,
-          level: 1
-        };
+  let gridNew = [|
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|O, O, X, X, X, O|],
+    [|O, O, O, X, O, O|],
+    [|X, O, X, X, X, X|],
+  |];
 
-        let gridStateBefore = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 3 },
-          grid: testGrid1
-        };
+  let stats = {score: 10, lines: 0, level: 1};
 
-        let statsAfter = {
-          score: 11,
-          lines: 0,
-          level: 1
-        };
+  let gridState = {
+    block,
+    blockPosition: {
+      x: 2,
+      y: 3,
+    },
+    grid,
+  };
 
-        let gridStateAfter = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 4 },
-          grid: testGrid1
-        };
+  let result = tick(gridState, stats, ~nextBlock, ());
 
-        let expected = {
-          gridState: gridStateAfter,
-          stats: statsAfter,
-          gameOver: false,
-          nextBlockToShow: testBlock
-        };
+  test("Grid updated", () =>
+    expect(result.gridState.grid) |> toEqual(gridNew)
+  );
 
-        expect(tick(gridStateBefore, statsBefore, ~nextBlock=testBlock, ())) |> toEqual(expected);
-      });
+  test("Next block used", () =>
+    expect(result.gridState.block) |> toEqual(nextBlock)
+  );
 
-      /* test("should return new state after strike", () => {
-        let stateBefore = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 4 },
-          grid: testGrid1
-        };
+  test("Game continues", () =>
+    expect(result.gameOver) |> toEqual(false)
+  );
+});
 
-        let expected = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 0 },
-          grid: testGrid2
-        };
+describe("Block placed, rows cleared, stats with level updated", () => {
+  let grid = [|
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|X, O, X, X, X, X|],
+  |];
 
-        expect(tick(stateBefore)) |> toEqual(expected);
-      }); */
+  let gridNew = [|
+    [|O, O, O, O, O, O|],
+    [|O, O, O, O, O, O|],
+    [|X, X, X, O, O, O|],
+  |];
 
-      /* test("should return new state with next block 1", () => {
-        let stateBefore = {
-          block: testBlock,
-          blockPosition: { x: 1, y: 3 },
-          grid: testGrid1
-        };
+  let stats = {score: 450, lines: 0, level: 1};
 
-        let expected = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 0 },
-          grid: testGrid3
-        };
+  let gridState = {
+    block,
+    blockPosition: {
+      x: 0,
+      y: 1,
+    },
+    grid,
+  };
 
-        expect(tick(stateBefore)) |> toEqual(expected);
-      }); */
+  let result = tick(gridState, stats, ~nextBlock, ());
 
-      /* test("should return new state with next block 2", () => {
-        let stateBefore = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 4 },
-          grid: testGrid4
-        };
+  test("Grid updated", () =>
+    expect(result.gridState.grid) |> toEqual(gridNew)
+  );
 
-        let expected = {
-          block: testBlock,
-          blockPosition: { x: 0, y: 0 },
-          grid: testGrid4After
-        };
+  test("Next block used", () =>
+    expect(result.gridState.block) |> toEqual(nextBlock)
+  );
 
-        expect(tick(stateBefore)) |> toEqual(expected);
-      }); */
+  test("Score updated", () =>
+    expect(result.stats) |> toEqual({score: 501, lines: 1, level: 2})
+  );
+});
 
-    });
-  });
+describe("Game over", () => {
+  let grid = [|
+    [|X, X, X, X, X, O|],
+    [|X, X, X, X, O, X|],
+    [|X, X, X, O, X, X|],
+    [|X, X, O, X, X, X|],
+  |];
+
+  let stats = {score: 450, lines: 0, level: 1};
+
+  let gridState = {
+    block,
+    blockPosition: {
+      x: 2,
+      y: 2,
+    },
+    grid,
+  };
+
+  let result = tick(gridState, stats, ~nextBlock=block, ());
+
+  test("Game over", () =>
+    expect(result.gameOver) |> toEqual(true)
+  );
+});
