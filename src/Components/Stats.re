@@ -1,13 +1,13 @@
 open Types;
 
-[%bs.raw {|require('./stats.css')|}];
+let styles = [%bs.raw {|require('./Stats.module.css')|}];
 
 module StatsRow = {
   [@react.component]
   let make = (~name: string, ~value: int) => {
-    <div className="statsRow">
-      <p className="statName"> {React.string(name)} </p>
-      <p className="statValue"> {React.string(string_of_int(value))} </p>
+    <div className=styles##statsRow>
+      <p> {React.string(name)} </p>
+      <p> {React.string(string_of_int(value))} </p>
     </div>;
   };
 };
@@ -16,7 +16,7 @@ module StatsRow = {
 let make = (~stats: stats, ~started) => {
   <div className="sideContainer">
     {if (started) {
-       <div className="stats">
+       <div className=styles##stats>
          <StatsRow name="Score" value={stats.score} />
          <StatsRow name="Lines" value={stats.lines} />
          <StatsRow name="Level" value={stats.level} />
