@@ -1,5 +1,8 @@
-[%bs.raw {|require('./App.css')|}];
+let styles = [%bs.raw {|require('./App.module.css')|}];
 
 [@react.component]
 let make = () =>
-  <div className="App"> <div className="App-header" /> <Game /> </div>;
+  <div className=styles##app>
+    <div className=styles##appHeader />
+    <Game />
+  </div>;
