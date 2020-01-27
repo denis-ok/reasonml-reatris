@@ -14,7 +14,7 @@ module StatsRow = {
 
 [@react.component]
 let make = (~stats: stats, ~started) => {
-  <div className="sideContainer">
+  <div className=styles##sideContainer>
     {if (started) {
        <div className=styles##stats>
          <StatsRow name="Score" value={stats.score} />

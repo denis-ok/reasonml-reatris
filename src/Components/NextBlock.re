@@ -1,8 +1,10 @@
 open Types;
 
+let styles = [%bs.raw {|require('./NextBlock.module.css')|}];
+
 [@react.component]
 let make = (~nextBlock: grid, ~started) => {
-  <div className="sideContainer">
+  <div className=styles##sideContainer>
     {if (started) {
        <div>
          {nextBlock
