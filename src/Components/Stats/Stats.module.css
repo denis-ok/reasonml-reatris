@@ -1,0 +1,18 @@
+.statsRow {
+  font-size: 34px;
+  color: #a5af92;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.sideContainer {
+  display: inline-block;
+  vertical-align: top;
+  width: 250px;
+  height: 600px;
+  margin: auto;
+}

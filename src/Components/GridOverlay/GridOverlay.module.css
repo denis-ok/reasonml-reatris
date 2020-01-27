@@ -1,4 +1,4 @@
-.grid-overlay {
+.gridOverlay {
   position: absolute;
   padding: 0;
   margin: 0;
@@ -13,7 +13,7 @@
   width: 0;
 }
 
-.title-heading {
+.titleHeading {
   position: absolute;
   top: 46px;
   padding: 0;

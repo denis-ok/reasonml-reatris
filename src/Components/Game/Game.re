@@ -4,7 +4,7 @@ open Types;
 
 [@bs.val] external document: Dom.document = "document";
 
-[%bs.raw {|require('./game.css')|}];
+let styles = [%bs.raw {|require('./Game.module.css')|}];
 
 let initGridState = Func.genInitGridState(~gridWidth=10, ~gridHeight=22);
 
@@ -214,9 +214,9 @@ let make = () => {
   let gridToRender =
     started ? Func.mapBlockToGrid(state.gridState) : initGridState.grid;
 
-  <div className="game">
+  <div className=styles##game>
     <NextBlock nextBlock={state.nextBlock} started />
-    <div className="gridContainer">
+    <div className=styles##gridContainer>
       <Grid grid=gridToRender />
       <GridOverlay
         screen

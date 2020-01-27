@@ -1,13 +1,13 @@
 open Types;
 
-[%bs.raw {|require('./gridOverlay.css')|}];
+let styles = [%bs.raw {|require('./GridOverlay.module.css')|}];
 
 module TitleScreen = {
   [@react.component]
   let make = (~clickStart) => {
-    <div className="grid-overlay">
-      <h2 className="title-heading"> {React.string("REATRIS")} </h2>
-      <div className="btn" onClick=clickStart>
+    <div className=styles##gridOverlay>
+      <h2 className=styles##titleHeading> {React.string("REATRIS")} </h2>
+      <div className=styles##btn onClick=clickStart>
         <p> {React.string("Start Game")} </p>
       </div>
     </div>;
@@ -17,8 +17,8 @@ module TitleScreen = {
 module CounterScreen = {
   [@react.component]
   let make = (~countdownCounter: countdownCounter) => {
-    <div className="grid-overlay">
-      <p className="number">
+    <div className=styles##gridOverlay>
+      <p className=styles##number>
         {React.string(string_of_int(countdownCounter))}
       </p>
     </div>;
@@ -28,8 +28,8 @@ module CounterScreen = {
 module GameoverScreen = {
   [@react.component]
   let make = (~clickStart) => {
-    <div className="grid-overlay">
-      <div className="btn" onClick=clickStart>
+    <div className=styles##gridOverlay>
+      <div className=styles##btn onClick=clickStart>
         <p> {React.string("Play Again?")} </p>
       </div>
     </div>;
