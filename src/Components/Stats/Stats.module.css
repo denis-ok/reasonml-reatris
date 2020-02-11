@@ -9,10 +9,9 @@
   justify-content: space-around;
 }
 
-.sideContainer {
-  display: inline-block;
-  vertical-align: top;
+.rightContainer {
+  display: flex;
+  justify-content: flex-start;
   width: 250px;
-  height: 600px;
-  margin: auto;
+  margin-left: 32px;
 }

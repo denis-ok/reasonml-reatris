@@ -4,7 +4,7 @@ let styles = [%raw {|require('./NextBlock.module.css')|}];
 
 [@react.component]
 let make = (~nextBlock: grid, ~started) => {
-  <div className=styles##sideContainer>
+  <div className=styles##leftContainer>
     {if (started) {
        <div>
          {nextBlock
