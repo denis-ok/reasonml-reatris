@@ -1,6 +1,6 @@
 open Types;
 
-let styles = [%bs.raw {|require('./Stats.module.css')|}];
+let styles = [%raw {|require('./Stats.module.css')|}];
 
 module StatsRow = {
   [@react.component]

@@ -1,6 +1,6 @@
 open Types;
 
-let styles = [%bs.raw {|require('./GridOverlay.module.css')|}];
+let styles = [%raw {|require('./GridOverlay.module.css')|}];
 
 module TitleScreen = {
   [@react.component]

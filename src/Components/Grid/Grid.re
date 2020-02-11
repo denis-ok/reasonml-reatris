@@ -1,6 +1,6 @@
 open Types;
 
-let styles = [%bs.raw {|require('./Grid.module.css')|}];
+let styles = [%raw {|require('./Grid.module.css')|}];
 
 module Tile = {
   [@react.component]

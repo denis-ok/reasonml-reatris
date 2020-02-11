@@ -4,7 +4,7 @@ open Types;
 
 [@bs.val] external document: Dom.document = "document";
 
-let styles = [%bs.raw {|require('./Game.module.css')|}];
+let styles = [%raw {|require('./Game.module.css')|}];
 
 let initGridState = Func.genInitGridState(~gridWidth=10, ~gridHeight=22);
 

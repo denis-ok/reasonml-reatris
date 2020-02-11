@@ -1,6 +1,6 @@
 open Types;
 
-let styles = [%bs.raw {|require('./NextBlock.module.css')|}];
+let styles = [%raw {|require('./NextBlock.module.css')|}];
 
 [@react.component]
 let make = (~nextBlock: grid, ~started) => {

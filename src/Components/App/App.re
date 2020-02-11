@@ -1,4 +1,4 @@
-let styles = [%bs.raw {|require('./App.module.css')|}];
+let styles = [%raw {|require('./App.module.css')|}];
 
 [@react.component]
 let make = () =>
