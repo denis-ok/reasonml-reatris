@@ -1,16 +1,16 @@
-.statsRow {
+.statsRow p {
+  margin-top: 0;
   font-size: 34px;
   color: #a5af92;
 }
 
-.stats {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+.statsRow p:first-child {
+  margin-bottom: 10px;
 }
 
 .rightContainer {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   width: 250px;
   margin-left: 32px;
