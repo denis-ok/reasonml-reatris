@@ -6,13 +6,11 @@ let styles = [%raw {|require('./NextBlock.module.css')|}];
 let make = (~nextBlock: grid, ~started) => {
   <div className=styles##leftContainer>
     {if (started) {
-       <div>
-         {nextBlock
-          ->Belt.Array.mapWithIndex((i, row) =>
-              <Grid.Row key={string_of_int(i)} row />
-            )
-          ->React.array}
-       </div>;
+       nextBlock
+       ->Belt.Array.mapWithIndex((i, row) =>
+           <Grid.Row key={string_of_int(i)} row />
+         )
+       ->React.array;
      } else {
        React.null;
      }}
