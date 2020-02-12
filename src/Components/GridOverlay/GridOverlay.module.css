@@ -26,12 +26,9 @@
 .btn {
   position: absolute;
   top: 339px;
-  margin: 0;
-  padding: 0;
   width: 250px;
   height: 82px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: #deeacb;
