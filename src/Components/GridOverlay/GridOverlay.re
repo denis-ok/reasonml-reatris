@@ -4,44 +4,38 @@ let styles = [%raw {|require('./GridOverlay.module.css')|}];
 
 module TitleScreen = {
   [@react.component]
-  let make = (~clickStart) => {
-    <div className=styles##gridOverlay>
+  let make = (~clickStart) =>
+    <>
       <h2 className=styles##titleHeading> {React.string("REATRIS")} </h2>
       <div className=styles##btn onClick=clickStart>
         <p> {React.string("Start Game")} </p>
       </div>
-    </div>;
-  };
+    </>;
 };
 
 module CounterScreen = {
   [@react.component]
-  let make = (~countdownCounter: countdownCounter) => {
-    <div className=styles##gridOverlay>
-      <p className=styles##number>
-        {React.string(string_of_int(countdownCounter))}
-      </p>
-    </div>;
-  };
+  let make = (~countdownCounter: countdownCounter) =>
+    <p className=styles##number>
+      {React.string(string_of_int(countdownCounter))}
+    </p>;
 };
 
 module GameoverScreen = {
   [@react.component]
-  let make = (~clickStart) => {
-    <div className=styles##gridOverlay>
-      <div className=styles##btn onClick=clickStart>
-        <p> {React.string("Play Again?")} </p>
-      </div>
+  let make = (~clickStart) =>
+    <div className=styles##btn onClick=clickStart>
+      <p> {React.string("Play Again?")} </p>
     </div>;
-  };
 };
 
 [@react.component]
-let make = (~screen, ~countdownCounter, ~clickStart) => {
-  switch (screen) {
-  | Title => <TitleScreen clickStart />
-  | Counter => <CounterScreen countdownCounter />
-  | Game => React.null
-  | Gameover => <GameoverScreen clickStart />
-  };
-};
+let make = (~screen, ~countdownCounter, ~clickStart) =>
+  <div className=styles##gridOverlay>
+    {switch (screen) {
+     | Title => <TitleScreen clickStart />
+     | Counter => <CounterScreen countdownCounter />
+     | Game => React.null
+     | Gameover => <GameoverScreen clickStart />
+     }}
+  </div>;

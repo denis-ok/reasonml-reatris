@@ -1,8 +1,4 @@
-let styles = [%raw {|require('./App.module.css')|}];
+[%raw {|require('normalize.css')|}];
 
 [@react.component]
-let make = () =>
-  <div className=styles##app>
-    <div className=styles##appHeader />
-    <Game />
-  </div>;
+let make = () => <Game />;

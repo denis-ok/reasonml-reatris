@@ -1,17 +1,9 @@
 .game {
-  padding: 0;
-  margin: 0;
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
 }
 
 .gridContainer {
-  display: inline-block;
   position: relative;
-}
-
-.sideContainer {
-  display: inline-block;
-  vertical-align: top;
-  width: 250px;
-  height: 600px;
-  margin: auto;
 }

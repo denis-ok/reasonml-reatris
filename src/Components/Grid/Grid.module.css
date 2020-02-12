@@ -1,12 +1,10 @@
 .grid {
   padding: 4px;
   background: rgb(100, 100, 100);
-  width: auto;
 }
 
 .gridRow {
   display: flex;
-  justify-content: center;
 }
 
 .tile {

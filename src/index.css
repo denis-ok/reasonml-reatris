@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css?family=Black+Ops+One');
+@import url("https://fonts.googleapis.com/css?family=Black+Ops+One");
 
 body {
-  margin: 0;
-  padding: 0;
   background-color: #222;
-  font-family: 'Black Ops One', cursive;
+  font-family: "Black Ops One", cursive;
 }
