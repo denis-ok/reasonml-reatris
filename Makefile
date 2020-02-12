@@ -27,6 +27,3 @@ webpack-build-prod:
 
 predeploy:
 	make reason-build && make webpack-build-prod
-
-deploy:
-	make predeploy && npm run gh-pages -- -d build
