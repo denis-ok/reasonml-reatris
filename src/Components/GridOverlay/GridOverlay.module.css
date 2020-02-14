@@ -1,3 +1,5 @@
+@import url("../../index.css");
+
 .gridOverlay {
   position: absolute;
   padding: 0;
@@ -15,26 +17,26 @@
 
 .titleHeading {
   position: absolute;
-  top: 46px;
+  top: var(--tile-width);
   padding: 0;
   margin: 0;
-  font-size: 70px;
+  font-size: calc(var(--tile-width) * 2);
   cursor: default;
   letter-spacing: 2px;
 }
 
 .btn {
   position: absolute;
-  top: 339px;
-  width: 250px;
-  height: 82px;
+  top: calc(var(--tile-width) * 9 + 4px);
+  width: calc(var(--tile-width) * 6 + 2px);
+  height: calc(var(--tile-width) * 2);
   display: flex;
   justify-content: center;
   align-items: center;
   background: #deeacb;
   border: 2px solid black;
   cursor: pointer;
-  font-size: 32px;
+  font-size: calc(var(--tile-width) * 0.9);
 }
 
 .btn:hover {
@@ -50,6 +52,6 @@
 .number {
   padding: 0;
   margin: 0;
-  font-size: 340px;
+  font-size: calc(var(--tile-width) * 10);
   cursor: default;
 }

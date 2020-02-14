@@ -1,3 +1,5 @@
+@import url("../../index.css");
+
 .grid {
   padding: 4px;
   background: rgb(100, 100, 100);
@@ -7,23 +9,22 @@
   display: flex;
 }
 
-.tile {
-  width: 40px;
-  height: 40px;
+.tileBase {
+  width: var(--tile-width);
+  height: var(--tile-width);
   border: solid 1px #687259;
-  background: rgb(20, 20, 20);
 }
-.tile:hover {
+
+.tileBase:hover {
   background-color: #484d52;
+}
+
+.tile {
+  composes: tileBase;
+  background: rgb(20, 20, 20);
 }
 
 .cell {
-  width: 40px;
-  height: 40px;
-  border: solid 1px #687259;
+  composes: tileBase;
   background: #a5af92;
-}
-
-.cell:hover {
-  background-color: #484d52;
 }
