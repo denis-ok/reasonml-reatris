@@ -1,4 +1,5 @@
 open Types;
+open Belt;
 
 let styles = [%raw {|require('./NextBlock.module.css')|}];
 
@@ -7,8 +8,8 @@ let make = (~nextBlock: grid, ~started) => {
   <div className=styles##leftContainer>
     {if (started) {
        nextBlock
-       ->Belt.Array.mapWithIndex((i, row) =>
-           <Grid.Row key={string_of_int(i)} row />
+       ->Array.mapWithIndex((i, row) =>
+           <Grid.Row key={Int.toString(i)} row />
          )
        ->React.array;
      } else {

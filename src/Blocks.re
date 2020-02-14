@@ -1,42 +1,26 @@
 open Types;
+open Belt;
 
-Random.init(int_of_float(Js.Date.now()));
+let mirror = block => block->Array.map(row => Array.reverse(row));
 
-let getRandomElemIndex = arr => Random.int(Array.length(arr));
-let getRandomElemFromArr = arr => arr[getRandomElemIndex(arr)];
+let blockT: block = [|[|X, X, X|], [|O, X, O|]|];
 
-let mirror = block  => block -> Belt.Array.map(row => Belt.Array.reverse(row));
+let blockBox: block = [|[|X, X|], [|X, X|]|];
 
-let blockT : block =
-[|
-[|X, X, X|],
-[|O, X, O|],
+let blockL: block = [|[|X, O|], [|X, O|], [|X, X|]|];
+
+let blockZ: block = [|[|O, X, X|], [|X, X, O|]|];
+
+let blockI: block = [|[|X, X, X, X|]|];
+
+let blocks = [|
+  blockT,
+  blockBox,
+  blockI,
+  blockL,
+  mirror(blockL),
+  blockZ,
+  mirror(blockZ),
 |];
 
-let blockBox : block =
-[|
-[|X, X|],
-[|X, X|],
-|];
-
-let blockL : block =
-[|
-[|X, O|],
-[|X, O|],
-[|X, X|],
-|];
-
-let blockZ : block =
-[|
-[|O, X, X|],
-[|X, X, O|],
-|];
-
-let blockI : block =
-[|
-[|X, X, X, X|]
-|];
-
-let blockColl = [|blockT, blockBox, blockI, blockL, mirror(blockL), blockZ, mirror(blockZ)|];
-
-let getRandomBlock = () => getRandomElemFromArr(blockColl);
+let getRandomBlock = () => Array.shuffle(blocks)->Array.getUnsafe(0);

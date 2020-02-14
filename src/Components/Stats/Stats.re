@@ -1,4 +1,5 @@
 open Types;
+open Belt;
 
 let styles = [%raw {|require('./Stats.module.css')|}];
 
@@ -7,7 +8,7 @@ module StatsRow = {
   let make = (~name: string, ~value: int) => {
     <div className=styles##statsRow>
       <p> {React.string(name)} </p>
-      <p> {React.string(string_of_int(value))} </p>
+      <p> {React.string(Int.toString(value))} </p>
     </div>;
   };
 };
