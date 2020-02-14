@@ -1,7 +1,9 @@
+@import url("../../index.css");
+
 .game {
   display: flex;
   justify-content: center;
-  margin-top: 32px;
+  margin-top: var(--tile-width);
 }
 
 .gridContainer {

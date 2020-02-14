@@ -2,6 +2,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 250px;
-  margin-right: 32px;
+  min-width: calc(var(--tile-width) * 4);
+  margin-right: var(--tile-width);
 }

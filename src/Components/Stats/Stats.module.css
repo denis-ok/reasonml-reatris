@@ -1,6 +1,8 @@
+@import url("../../index.css");
+
 .statsRow p {
   margin-top: 0;
-  font-size: 34px;
+  font-size: calc(var(--tile-width) * 0.85);
   color: #a5af92;
 }
 
@@ -12,6 +14,6 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 250px;
-  margin-left: 32px;
+  min-width: calc(var(--tile-width) * 4);
+  margin-left: var(--tile-width);
 }
