@@ -14,16 +14,13 @@ module StatsRow = {
 };
 
 [@react.component]
-let make = (~stats: stats, ~started) => {
-  <div className=styles##rightContainer>
-    {if (started) {
-       <>
-         <StatsRow name="Score" value={stats.score} />
-         <StatsRow name="Lines" value={stats.lines} />
-         <StatsRow name="Level" value={stats.level} />
-       </>;
-     } else {
-       React.null;
-     }}
-  </div>;
-};
+let make = (~stats: stats, ~started) =>
+  if (started) {
+    <div className=styles##rightContainer>
+      <StatsRow name="Score" value={stats.score} />
+      <StatsRow name="Lines" value={stats.lines} />
+      <StatsRow name="Level" value={stats.level} />
+    </div>;
+  } else {
+    React.null;
+  };
