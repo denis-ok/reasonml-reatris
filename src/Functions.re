@@ -1,7 +1,9 @@
 open Types;
+open Belt;
 
-let getWidth = (grid: grid) => Array.length(grid[0]);
-let getHeight = (grid: grid) => Array.length(grid);
+let getWidth = (grid: grid) => grid->Array.getUnsafe(0)->Array.size;
+
+let getHeight = (grid: grid) => Array.size(grid);
 
 let isValidPosition = (position: blockPosition, block: block, grid: grid) => {
   let {x, y} = position;
@@ -19,11 +21,11 @@ let isValidPosition = (position: blockPosition, block: block, grid: grid) => {
 };
 
 let canMapRow = (posX: int, blockRow: row, gridRow: row) =>
-  blockRow->Belt.Array.reduceWithIndex(_, true, (acc, blockCell, i) =>
+  blockRow->Array.reduceWithIndex(_, true, (acc, blockCell, i) =>
               switch (acc) {
               | false => false
               | true =>
-                let gridCell = gridRow[posX + i];
+                let gridCell = Array.getUnsafe(gridRow, posX + i);
                 switch (blockCell, gridCell) {
                 | (O, O) => true
                 | (X, O) => true
@@ -37,11 +39,11 @@ let canMapBlock = (position: blockPosition, block: block, grid: grid) => {
   let validPosition = isValidPosition(position, block, grid);
 
   if (validPosition) {
-    block->Belt.Array.reduceWithIndex(_, true, (acc, blockRow, i) =>
+    block->Array.reduceWithIndex(_, true, (acc, blockRow, i) =>
              switch (acc) {
              | false => false
              | true =>
-               let gridRow = grid[position.y + i];
+               let gridRow = Array.getUnsafe(grid, position.y + i);
                gridRow->canMapRow(position.x, blockRow, _);
              }
            );
@@ -50,13 +52,13 @@ let canMapBlock = (position: blockPosition, block: block, grid: grid) => {
   };
 };
 
-let mapBlockRowToGridRow = (posX: int, blockRow: row, gridRow: row) => {
-  let newGridRow = Belt.Array.copy(gridRow);
+let mapBlockRowToGridRow = (~posX: int, ~blockRow: row, ~gridRow: row) => {
+  let newGridRow = Array.copy(gridRow);
 
-  blockRow->Belt.Array.forEachWithIndex((i, blockCell) =>
+  blockRow->Array.forEachWithIndex((i, blockCell) =>
     switch (blockCell) {
     | O => ()
-    | X => newGridRow[posX + i] = blockCell
+    | X => Array.setUnsafe(newGridRow, posX + i, blockCell)
     }
   );
 
@@ -64,12 +66,21 @@ let mapBlockRowToGridRow = (posX: int, blockRow: row, gridRow: row) => {
 };
 
 let mapBlockToGrid = ({blockPosition, block, grid}: gridState) => {
-  let newGrid = Belt.Array.copy(grid);
+  let newGrid = Array.copy(grid);
 
-  block->Belt.Array.forEachWithIndex((i, blockRow) => {
+  block->Array.forEachWithIndex((i, blockRow) => {
     let gridRowIndex = blockPosition.y + i;
-    newGrid[gridRowIndex] =
-      mapBlockRowToGridRow(blockPosition.x, blockRow, grid[gridRowIndex]);
+
+    let currentGridRow = Array.getUnsafe(grid, gridRowIndex);
+
+    let newGridRow =
+      mapBlockRowToGridRow(
+        ~posX=blockPosition.x,
+        ~blockRow,
+        ~gridRow=currentGridRow,
+      );
+
+    Array.setUnsafe(newGrid, gridRowIndex, newGridRow);
   });
 
   newGrid;
@@ -77,7 +88,7 @@ let mapBlockToGrid = ({blockPosition, block, grid}: gridState) => {
 
 let getStrokeIndexes = (grid: grid) => {
   let checkRow = gridRow =>
-    gridRow->Belt.Array.reduce(true, (acc, elem) =>
+    gridRow->Array.reduce(true, (acc, elem) =>
       switch (acc, elem) {
       | (true, X) => true
       | (_, _) => false
@@ -85,32 +96,28 @@ let getStrokeIndexes = (grid: grid) => {
     );
 
   grid
-  ->Belt.Array.reduceWithIndex(
+  ->Array.reduceWithIndex(
       [],
       (acc, gridRow, i) => {
         let hasStroke = checkRow(gridRow);
         hasStroke ? [i, ...acc] : acc;
       },
     )
-  ->Belt.List.toArray;
+  ->List.toArray;
 };
 
 let removeFilledRows = (grid: grid, indexes) => {
-  let indexesCount = Array.length(indexes);
+  let indexesCount = Array.size(indexes);
 
   if (indexesCount == 0) {
     grid;
   } else {
     let hasIndex = i => Js.Array.includes(i, indexes);
-    let emptyRow = Belt.Array.make(Array.length(grid[0]), O);
+    let emptyRow = Array.make(Array.size(Array.getUnsafe(grid, 0)), O);
 
-    let filteredGrid =
-      grid->Belt.Array.keepWithIndex((_el, i) => !hasIndex(i));
+    let filteredGrid = grid->Array.keepWithIndex((_el, i) => !hasIndex(i));
 
-    filteredGrid->Belt.Array.concat(
-                    Belt.Array.make(indexesCount, emptyRow),
-                    _,
-                  );
+    filteredGrid->Array.concat(Array.make(indexesCount, emptyRow), _);
   };
 };
 
@@ -235,14 +242,15 @@ let getGridStateAfterMove = (direction: direction, gridState) => {
 };
 
 let rotate2dArr = (arr: array(array('a))) => {
-  let initArr = arr[0];
+  let initArr = Array.getUnsafe(arr, 0);
 
-  let getColumn = (i, grid) => grid->Belt.Array.map(row => row[i]);
+  let getColumn = (i, grid) =>
+    grid->Array.map(row => Array.getUnsafe(row, i));
 
-  initArr->Belt.Array.mapWithIndex((i, _row) => getColumn(i, arr));
+  initArr->Array.mapWithIndex((i, _row) => getColumn(i, arr));
 };
 
-let rotateClockwise = grid => grid->Belt.Array.reverse->rotate2dArr;
+let rotateClockwise = grid => grid->Array.reverse->rotate2dArr;
 
 let getGridStateAfterRotate = gridState => {
   let {blockPosition, block, grid} = gridState;

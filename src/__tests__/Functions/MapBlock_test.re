@@ -8,7 +8,7 @@ describe("map block row to grid row", () => {
   let gridRow = [|O, X, O, O, O, O|];
 
   test("map row", () => {
-    let result = mapBlockRowToGridRow(0, blockRow, gridRow);
+    let result = mapBlockRowToGridRow(~posX=0, ~blockRow, ~gridRow);
     let expected = [|X, X, X, O, O, O|];
 
     expect(result) |> toEqual(expected);
