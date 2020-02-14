@@ -1,4 +1,5 @@
 open Types;
+open Belt;
 
 let styles = [%raw {|require('./GridOverlay.module.css')|}];
 
@@ -17,7 +18,7 @@ module CounterScreen = {
   [@react.component]
   let make = (~countdownCounter: countdownCounter) =>
     <p className=styles##number>
-      {React.string(string_of_int(countdownCounter))}
+      {React.string(Int.toString(countdownCounter))}
     </p>;
 };
 

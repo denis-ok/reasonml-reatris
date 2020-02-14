@@ -1,4 +1,5 @@
 open Types;
+open Belt;
 
 let styles = [%raw {|require('./Grid.module.css')|}];
 
@@ -20,9 +21,7 @@ module Row = {
   let make = (~row: row) => {
     <div className=styles##gridRow>
       {row
-       ->Belt.Array.mapWithIndex((i, cell) =>
-           <Tile key={string_of_int(i)} cell />
-         )
+       ->Array.mapWithIndex((i, cell) => <Tile key={Int.toString(i)} cell />)
        ->React.array}
     </div>;
   };
@@ -32,8 +31,8 @@ module Row = {
 let make = (~grid: grid) => {
   <div className=styles##grid>
     {grid
-     ->Belt.Array.mapWithIndex((i, row) =>
-         i > 1 ? <Row key={string_of_int(i)} row /> : React.null
+     ->Array.mapWithIndex((i, row) =>
+         i > 1 ? <Row key={Int.toString(i)} row /> : React.null
        )
      ->React.array}
   </div>;

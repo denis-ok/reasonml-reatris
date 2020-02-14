@@ -1,6 +1,8 @@
 module Func = Functions;
 module Const = Constants;
+
 open Types;
+open Belt;
 
 [@bs.val] external document: Dom.document = "document";
 
@@ -49,7 +51,7 @@ let make = () => {
       timers.rotate,
       timers.countdown,
     ]
-    ->(Belt.List.forEach(t => Utils.clearIntervalId(t)));
+    ->(List.forEach(Utils.clearIntervalId));
   };
 
   let moveBlock = direction => {

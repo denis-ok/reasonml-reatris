@@ -112,7 +112,7 @@ let removeFilledRows = (grid: grid, indexes) => {
   if (indexesCount == 0) {
     grid;
   } else {
-    let hasIndex = i => Js.Array.includes(i, indexes);
+    let hasIndex = i => Array.some(indexes, idx => idx == i);
     let emptyRow = Array.make(Array.size(Array.getUnsafe(grid, 0)), O);
 
     let filteredGrid = grid->Array.keepWithIndex((_el, i) => !hasIndex(i));
