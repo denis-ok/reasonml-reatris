@@ -1,6 +1,18 @@
 @import url("https://fonts.googleapis.com/css?family=Black+Ops+One");
 
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 body {
   background-color: #222;
   font-family: "Black Ops One", cursive;
+}
+
+:root {
+  --tile-width: calc(100vh / 24);
 }
