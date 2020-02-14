@@ -7,7 +7,7 @@ let blockT: block = [|[|X, X, X|], [|O, X, O|]|];
 
 let blockBox: block = [|[|X, X|], [|X, X|]|];
 
-let blockL: block = [|[|X, O|], [|X, O|], [|X, X|]|];
+let blockL: block = [|[|X, X, X|], [|X, O, O|]|];
 
 let blockZ: block = [|[|O, X, X|], [|X, X, O|]|];
 
