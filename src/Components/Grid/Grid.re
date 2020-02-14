@@ -32,7 +32,8 @@ let make = (~grid: grid) => {
   <div className=styles##grid>
     {grid
      ->Array.mapWithIndex((i, row) =>
-         i > 1 ? <Row key={Int.toString(i)} row /> : React.null
+         i >= Constants.Grid.hiddenRowsCount - 1
+           ? <Row key={Int.toString(i)} row /> : React.null
        )
      ->React.array}
   </div>;

@@ -2,6 +2,13 @@ let dropDelay = 25;
 let moveDelay = 70;
 let rotateDelay = 90;
 let countDelay = 1000;
-let hiddenRowsCount = 3;
 
-let initStats: Types.stats = {score: 0, lines: 0, level: 1};
+module Grid = {
+  let hiddenRowsCount = 3;
+
+  let width = 10;
+
+  let heightVisible = 20;
+
+  let height = heightVisible + hiddenRowsCount;
+};

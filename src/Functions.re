@@ -126,7 +126,7 @@ let calcInitBlockPosition = (~block: block, ~gridWidth: int): blockPosition => {
   let blockHeight = getHeight(block);
 
   let posX = gridWidth / 2 - blockWidth / 2;
-  let posY = Constants.hiddenRowsCount - blockHeight;
+  let posY = Constants.Grid.hiddenRowsCount - blockHeight;
 
   let position = {x: posX, y: posY};
   position;

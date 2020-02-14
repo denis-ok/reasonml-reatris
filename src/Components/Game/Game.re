@@ -8,12 +8,20 @@ open Belt;
 
 let styles = [%raw {|require('./Game.module.css')|}];
 
-let initGridState = Func.genInitGridState(~gridWidth=10, ~gridHeight=22);
+let initGridState =
+  Func.genInitGridState(
+    ~gridWidth=Constants.Grid.width,
+    ~gridHeight=Constants.Grid.height,
+  );
 
 let initGlobalState: globalState = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
-  stats: Const.initStats,
+  stats: {
+    score: 0,
+    lines: 0,
+    level: 1,
+  },
   gameOver: false,
 };
 
