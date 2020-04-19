@@ -1,0 +1,27 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js 13.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: '13.x'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Reason build
+      run: npm run reason-build
+
+    - name: Webpack build
+      run: NODE_ENV=production npm run webpack
+
+    - name: Test
+      run: npm run jest
