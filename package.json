@@ -22,7 +22,7 @@
   "devDependencies": {
     "@glennsl/bs-jest": "^0.5.1",
     "bs-platform": "^7.2.2",
-    "bs-webapi": "^0.15.7",
+    "bs-webapi": "^0.15.9",
     "clean-webpack-plugin": "^3.0.0",
     "concurrently": "^5.1.0",
     "css-loader": "^3.5.2",
