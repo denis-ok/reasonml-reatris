@@ -29,4 +29,15 @@ predeploy:
 	make reason-build && make webpack-build-prod
 
 update-babel:
-	npm uninstal @babel/core && npm uninstall @babel/preset-env && npm i -D @babel/core && npm i -D @babel/preset-env
+	npm uninstal @babel/core && \
+	npm uninstall @babel/preset-env && \
+	npm i -D @babel/core && \
+	npm i -D @babel/preset-env
+
+update-webpack:
+	npm uninstall webpack && \
+	npm uninstall webpack-cli && \
+	npm uninstall webpack-dev-server && \
+	npm i -D webpack && \
+	npm i -D webpack-cli && \
+	npm i -D webpack-dev-server
