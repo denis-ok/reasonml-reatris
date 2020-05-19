@@ -41,3 +41,13 @@ update-webpack:
 	npm i -D webpack && \
 	npm i -D webpack-cli && \
 	npm i -D webpack-dev-server
+
+update-webpack-plugins:
+	npm uninstall clean-webpack-plugin && \
+	npm uninstall html-webpack-plugin && \
+	npm uninstall css-loader && \
+	npm uninstall style-loader && \
+	npm i -D clean-webpack-plugin && \
+	npm i -D html-webpack-plugin && \
+	npm i -D css-loader && \
+	npm i -D style-loader
