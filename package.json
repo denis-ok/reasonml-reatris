@@ -30,6 +30,7 @@
     "concurrently": "^5.1.0",
     "css-loader": "^3.5.3",
     "html-webpack-plugin": "^4.3.0",
+    "identity-obj-proxy": "^3.0.0",
     "style-loader": "^1.2.1",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
