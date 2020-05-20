@@ -1,7 +1,7 @@
 open Types;
 open Belt;
 
-let styles = [%raw {|require('./Grid.module.css')|}];
+[@bs.module "./Grid.module.css"] external styles: Js.t({..}) = "default";
 
 module Tile = {
   [@react.component]

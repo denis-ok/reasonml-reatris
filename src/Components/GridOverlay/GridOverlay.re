@@ -1,7 +1,7 @@
 open Types;
 open Belt;
 
-let styles = [%raw {|require('./GridOverlay.module.css')|}];
+[@bs.module "./GridOverlay.module.css"] external styles: Js.t({..}) = "default";
 
 module TitleScreen = {
   [@react.component]

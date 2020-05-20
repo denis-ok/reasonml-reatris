@@ -1,7 +1,7 @@
 open Types;
 open Belt;
 
-let styles = [%raw {|require('./Stats.module.css')|}];
+[@bs.module "./Stats.module.css"] external styles: Js.t({..}) = "default";
 
 module StatsRow = {
   [@react.component]

@@ -6,7 +6,7 @@ open Belt;
 
 [@bs.val] external document: Dom.document = "document";
 
-let styles = [%raw {|require('./Game.module.css')|}];
+[@bs.module "./Game.module.css"] external styles: Js.t({..}) = "default";
 
 let initGridState =
   Func.genInitGridState(

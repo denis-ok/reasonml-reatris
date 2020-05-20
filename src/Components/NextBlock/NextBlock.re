@@ -1,7 +1,7 @@
 open Types;
 open Belt;
 
-let styles = [%raw {|require('./NextBlock.module.css')|}];
+[@bs.module "./NextBlock.module.css"] external styles: Js.t({..}) = "default";
 
 [@react.component]
 let make = (~nextBlock: grid, ~started) =>
