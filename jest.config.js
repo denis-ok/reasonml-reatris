@@ -1,9 +1,8 @@
 module.exports = {
-  testEnvironment: "node",
-  // testEnvironment: 'jsdom',
+  testEnvironment: "jsdom",
   // testURL: "http://localhost/",
   verbose: true,
-  testRegex: "\\_test\\.bs\\.js",
+  testRegex: "\\_test\\.bs\\.js$",
   transform: {
     "^.+\\.jsx?$": `<rootDir>/babel.test.config.js`,
   },
@@ -14,4 +13,7 @@ module.exports = {
   // SyntaxError: Cannot use import statement outside a module
   // Avoiding it with transformIgnorePatterns option
   transformIgnorePatterns: ["<rootDir>/public/"],
+  moduleNameMapper: {
+    "\\.(css)$": "identity-obj-proxy",
+  },
 };
