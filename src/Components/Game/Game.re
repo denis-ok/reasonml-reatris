@@ -13,7 +13,7 @@ let initGridState =
     ~gridHeight=Constants.Grid.height,
   );
 
-let initGlobalState: globalState = {
+let initGlobalState: GlobalState.t = {
   gridState: initGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: {
@@ -24,9 +24,9 @@ let initGlobalState: globalState = {
   gameOver: false,
 };
 
-type state = globalState;
+type state = GlobalState.t;
 
-let getNextScreen = currentScreen => {
+let getNextScreen = (currentScreen: Screen.t): Screen.t => {
   switch (currentScreen) {
   | Title => Counter
   | Counter => Game
@@ -46,7 +46,7 @@ let initTimerIds = {
 [@react.component]
 let make = () => {
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-  let (screen, setScreen) = React.useState(() => Title);
+  let (screen, setScreen) = React.useState(() => Screen.Title);
   let (countdownCounter, setCountdownCounter) = React.useState(() => 0);
   let (state, setState) = React.useState(() => initGlobalState);
 
@@ -86,7 +86,7 @@ let make = () => {
           (),
         );
 
-      let {gridState, stats, gameOver, nextBlockToShow} = next;
+      let {gridState, stats, gameOver, nextBlockToShow}: TickOutput.t = next;
 
       if (gameOver) {
         clearAllTimers();

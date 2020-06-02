@@ -1,7 +1,8 @@
 open Types;
 open Belt;
 
-[@bs.module "./GridOverlay.module.css"] external styles: Js.t({..}) = "default";
+[@bs.module "./GridOverlay.module.css"]
+external styles: Js.t({..}) = "default";
 
 module TitleScreen = {
   [@react.component]
@@ -31,7 +32,7 @@ module GameoverScreen = {
 };
 
 [@react.component]
-let make = (~screen, ~countdownCounter, ~clickStart) =>
+let make = (~screen: Screen.t, ~countdownCounter, ~clickStart) =>
   <div className=styles##gridOverlay>
     {switch (screen) {
      | Title => <TitleScreen clickStart />

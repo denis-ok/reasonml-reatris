@@ -1,4 +1,4 @@
-open Types;
+open Types.GameStats;
 open Belt;
 
 [@bs.module "./Stats.module.css"] external styles: Js.t({..}) = "default";
@@ -14,7 +14,7 @@ module StatsRow = {
 };
 
 [@react.component]
-let make = (~stats: stats, ~started) =>
+let make = (~stats: t, ~started) =>
   if (started) {
     <div className=styles##rightContainer>
       <StatsRow name="Score" value={stats.score} />
