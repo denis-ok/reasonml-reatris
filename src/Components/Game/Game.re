@@ -1,4 +1,3 @@
-module Func = Functions;
 module Const = Constants;
 
 open Types;
@@ -8,14 +7,14 @@ open Belt;
 
 [@bs.module "./Game.module.css"] external styles: Js.t({..}) = "default";
 
-let initGridState =
-  Func.genInitGridState(
+let initialGridState =
+  Core.genInitGridState(
     ~gridWidth=Constants.Grid.width,
     ~gridHeight=Constants.Grid.height,
   );
 
-let initGlobalState: globalState = {
-  gridState: initGridState,
+let initialGlobalState: GlobalState.t = {
+  gridState: initialGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: {
     score: 0,
@@ -23,17 +22,6 @@ let initGlobalState: globalState = {
     level: 1,
   },
   gameOver: false,
-};
-
-type state = globalState;
-
-let getNextScreen = currentScreen => {
-  switch (currentScreen) {
-  | Title => Counter
-  | Counter => Game
-  | Game => Gameover
-  | Gameover => Counter
-  };
 };
 
 let initTimerIds = {
@@ -47,9 +35,9 @@ let initTimerIds = {
 [@react.component]
 let make = () => {
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-  let (screen, setScreen) = React.useState(() => Title);
+  let (screen, setScreen) = React.useState(() => Screen.Title);
   let (countdownCounter, setCountdownCounter) = React.useState(() => 0);
-  let (state, setState) = React.useState(() => initGlobalState);
+  let (state, setState) = React.useState(() => initialGlobalState);
 
   let clearAllTimers = () => {
     [
@@ -66,28 +54,28 @@ let make = () => {
     setState(state =>
       {
         ...state,
-        gridState: Func.getGridStateAfterMove(direction, state.gridState),
+        gridState: Core.getGridStateAfterMove(direction, state.gridState),
       }
     );
   };
 
   let rotateBlock = () => {
     setState(state =>
-      {...state, gridState: Func.getGridStateAfterRotate(state.gridState)}
+      {...state, gridState: Core.getGridStateAfterRotate(state.gridState)}
     );
   };
 
   let tick = () => {
     setState(state => {
       let next =
-        Func.tick(
+        Core.tick(
           state.gridState,
           state.stats,
           ~nextBlock=state.nextBlock,
           (),
         );
 
-      let {gridState, stats, gameOver, nextBlockToShow} = next;
+      let {gridState, stats, gameOver, nextBlockToShow}: TickOutput.t = next;
 
       if (gameOver) {
         clearAllTimers();
@@ -120,40 +108,41 @@ let make = () => {
     let keyRepeated = Utils.Dom.isKeyRepeated(event);
 
     if (!keyRepeated) {
-      let key = Utils.Dom.getKeyName(event);
+      let pressedButton =
+        Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
-      switch (key) {
-      | "ArrowLeft" =>
+      switch (pressedButton) {
+      | ArrowLeft =>
         updateTimer(timers.moveLeft, () => moveBlock(Left), Const.moveDelay)
-      | "ArrowRight" =>
+      | ArrowRight =>
         updateTimer(
           timers.moveRight,
           () => moveBlock(Right),
           Const.moveDelay,
         )
-      | "ArrowUp" =>
-        updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
-      | "ArrowDown" => updateTimer(timers.tick, tick, Const.dropDelay)
-      | _ => ()
+      | ArrowUp => updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
+      | ArrowDown => updateTimer(timers.tick, tick, Const.dropDelay)
+      | Unsupported => ()
       };
     };
   };
 
   let keyUpHandler = event => {
-    let key = Utils.Dom.getKeyName(event);
+    let pressedButton =
+      Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
-    switch (key) {
-    | "ArrowLeft" => Utils.clearIntervalId(timers.moveLeft)
-    | "ArrowRight" => Utils.clearIntervalId(timers.moveRight)
-    | "ArrowUp" => Utils.clearIntervalId(timers.rotate)
-    | "ArrowDown" =>
-      let delay = Func.calcDelay(state.stats.level);
+    switch (pressedButton) {
+    | ArrowLeft => Utils.clearIntervalId(timers.moveLeft)
+    | ArrowRight => Utils.clearIntervalId(timers.moveRight)
+    | ArrowUp => Utils.clearIntervalId(timers.rotate)
+    | ArrowDown =>
+      let delay = Core.calcDelay(state.stats.level);
       updateTimer(timers.tick, tick, delay);
-    | _ => ()
+    | Unsupported => ()
     };
   };
 
-  let startGame = () => setScreen(_ => getNextScreen(screen));
+  let startGame = () => setScreen(_ => Core.nextScreen(screen));
 
   React.useEffect(() => {
     if (screen == Counter) {
@@ -200,9 +189,9 @@ let make = () => {
   );
 
   let startCountdown = () => {
-    setState(_ => initGlobalState);
+    setState(_ => initialGlobalState);
     setCountdownCounter(_ => 3);
-    setScreen(_ => getNextScreen(screen));
+    setScreen(_ => Core.nextScreen(screen));
   };
 
   // Use Tick
@@ -210,7 +199,7 @@ let make = () => {
     () => {
       switch (screen) {
       | Game =>
-        let delay = Func.calcDelay(state.stats.level);
+        let delay = Core.calcDelay(state.stats.level);
         updateTimer(timers.tick, tick, delay);
       | _ => ()
       };
@@ -222,7 +211,7 @@ let make = () => {
   let started = screen == Game || screen == Gameover;
 
   let gridToRender =
-    started ? Func.mapBlockToGrid(state.gridState) : initGridState.grid;
+    started ? Core.mapBlockToGrid(state.gridState) : initialGridState.grid;
 
   <div className=styles##game>
     <NextBlock nextBlock={state.nextBlock} started />

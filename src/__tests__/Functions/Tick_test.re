@@ -1,7 +1,7 @@
 open Jest;
 open Expect;
 open Types;
-open Functions;
+open Core;
 
 let block = [|[|X, X, X|], [|O, X, O|]|];
 
@@ -17,9 +17,9 @@ test("Simple tick: increment block position and score by 1", () => {
     [|X, O, X, X, X, X|],
   |];
 
-  let stats = {score: 10, lines: 0, level: 1};
+  let stats: GameStats.t = {score: 10, lines: 0, level: 1};
 
-  let gridState = {
+  let gridState: GridState.t = {
     block,
     blockPosition: {
       x: 0,
@@ -28,26 +28,28 @@ test("Simple tick: increment block position and score by 1", () => {
     grid,
   };
 
-  let result = tick(gridState, stats, ~nextBlock, ());
+  let result: Reatris.Types.TickOutput.t =
+    tick(gridState, stats, ~nextBlock, ());
 
-  expect(result)
-  |> toEqual({
-       gridState: {
-         block,
-         blockPosition: {
-           x: 0,
-           y: 4,
-         },
-         grid,
-       },
-       stats: {
-         score: 11,
-         lines: 0,
-         level: 1,
-       },
-       gameOver: false,
-       nextBlockToShow: nextBlock,
-     });
+  let expecting: Reatris.Types.TickOutput.t = {
+    gridState: {
+      block,
+      blockPosition: {
+        x: 0,
+        y: 4,
+      },
+      grid,
+    },
+    stats: {
+      score: 11,
+      lines: 0,
+      level: 1,
+    },
+    gameOver: false,
+    nextBlockToShow: nextBlock,
+  };
+
+  expect(result) |> toEqual(expecting);
 });
 
 describe("Block placed", () => {
@@ -69,9 +71,9 @@ describe("Block placed", () => {
     [|X, O, X, X, X, X|],
   |];
 
-  let stats = {score: 10, lines: 0, level: 1};
+  let stats: GameStats.t = {score: 10, lines: 0, level: 1};
 
-  let gridState = {
+  let gridState: GridState.t = {
     block,
     blockPosition: {
       x: 2,
@@ -108,9 +110,9 @@ describe("Block placed, rows cleared, stats with level updated", () => {
     [|X, X, X, O, O, O|],
   |];
 
-  let stats = {score: 450, lines: 0, level: 1};
+  let stats: GameStats.t = {score: 450, lines: 0, level: 1};
 
-  let gridState = {
+  let gridState: GridState.t = {
     block,
     blockPosition: {
       x: 0,
@@ -130,7 +132,8 @@ describe("Block placed, rows cleared, stats with level updated", () => {
   );
 
   test("Score updated", () =>
-    expect(result.stats) |> toEqual({score: 501, lines: 1, level: 2})
+    expect(result.stats)
+    |> toEqual(GameStats.{score: 501, lines: 1, level: 2})
   );
 });
 
@@ -142,9 +145,9 @@ describe("Game over", () => {
     [|X, X, O, X, X, X|],
   |];
 
-  let stats = {score: 450, lines: 0, level: 1};
+  let stats: GameStats.t = {score: 450, lines: 0, level: 1};
 
-  let gridState = {
+  let gridState: GridState.t = {
     block,
     blockPosition: {
       x: 2,

@@ -1,7 +1,7 @@
 open Jest;
 open Expect;
 open Types;
-open Functions;
+open Core
 
 test("Block appears in a middle of a grid", () => {
   let block = Blocks.blockBox;

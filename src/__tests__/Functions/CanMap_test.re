@@ -1,7 +1,7 @@
 open Jest;
 open Expect;
 open Types;
-open Functions;
+open Core
 
 describe("Can map row?", () => {
   let blockRow = [|X, O, X, O|];

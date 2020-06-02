@@ -28,24 +28,6 @@ type countdownId = ref(option(Js.Global.intervalId));
 
 type countdownCounter = int;
 
-type gridState = {
-  block,
-  blockPosition,
-  grid,
-};
-
-type stats = {
-  score: int,
-  lines: int,
-  level: int,
-};
-
-type screen =
-  | Title
-  | Counter
-  | Game
-  | Gameover;
-
 type timerIds = {
   tick: intervalId,
   countdown: intervalId,
@@ -54,26 +36,67 @@ type timerIds = {
   rotate: intervalId,
 };
 
-type gameState = {
-  gridState,
-  stats,
-  gameOver,
+module GridState = {
+  type t = {
+    block,
+    blockPosition,
+    grid,
+  };
 };
 
-type tickOutput = {
-  gridState,
-  stats,
-  gameOver,
-  nextBlockToShow: block,
+module GameStats = {
+  type t = {
+    score: int,
+    lines: int,
+    level: int,
+  };
 };
 
-type globalState = {
-  gridState,
-  nextBlock: block,
-  stats,
-  gameOver,
+module Screen = {
+  type t =
+    | Title
+    | Counter
+    | Game
+    | Gameover;
 };
 
-type direction =
-  | Left
-  | Right;
+module TickOutput = {
+  type t = {
+    gridState: GridState.t,
+    stats: GameStats.t,
+    gameOver,
+    nextBlockToShow: block,
+  };
+};
+
+module GlobalState = {
+  type t = {
+    gridState: GridState.t,
+    nextBlock: block,
+    stats: GameStats.t,
+    gameOver,
+  };
+};
+
+module Direction = {
+  type t =
+    | Left
+    | Right;
+};
+
+module KeyboardButton = {
+  type t =
+    | ArrowUp
+    | ArrowRight
+    | ArrowDown
+    | ArrowLeft
+    | Unsupported;
+
+  let fromString =
+    fun
+    | "ArrowUp" => ArrowUp
+    | "ArrowRight" => ArrowRight
+    | "ArrowDown" => ArrowDown
+    | "ArrowLeft" => ArrowLeft
+    | _ => Unsupported;
+};

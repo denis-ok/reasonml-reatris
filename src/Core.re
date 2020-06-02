@@ -65,7 +65,7 @@ let mapBlockRowToGridRow = (~posX: int, ~blockRow: row, ~gridRow: row) => {
   newGridRow;
 };
 
-let mapBlockToGrid = ({blockPosition, block, grid}: gridState) => {
+let mapBlockToGrid = ({blockPosition, block, grid}: GridState.t) => {
   let newGrid = Array.copy(grid);
 
   block->Array.forEachWithIndex((i, blockRow) => {
@@ -132,7 +132,7 @@ let calcInitBlockPosition = (~block: block, ~gridWidth: int): blockPosition => {
   position;
 };
 
-let genInitGridState = (~gridWidth: int, ~gridHeight: int): gridState => {
+let genInitGridState = (~gridWidth: int, ~gridHeight: int): GridState.t => {
   let emptyRow = Array.make(gridWidth, O);
   let emptyGrid = Array.make(gridHeight, emptyRow);
 
@@ -145,8 +145,8 @@ let genInitGridState = (~gridWidth: int, ~gridHeight: int): gridState => {
 
 let calcLevel = score => score / 500 + 1;
 
-let calcNextStats = (~stats: stats, ~strokesCount) => {
-  let {score, lines, level} = stats;
+let calcNextStats = (~stats: GameStats.t, ~strokesCount: int): GameStats.t => {
+  let {score, lines, level}: GameStats.t = stats;
 
   let strokesBonus =
     switch (strokesCount) {
@@ -166,8 +166,10 @@ let calcNextStats = (~stats: stats, ~strokesCount) => {
   };
 };
 
-let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
-  let {blockPosition, block, grid}: gridState = gridState;
+let tick =
+    (gridState: GridState.t, stats: GameStats.t, ~nextBlock=?, ())
+    : TickOutput.t => {
+  let {blockPosition, block, grid}: GridState.t = gridState;
   let {x, y} = blockPosition;
   let nextPosition = {x, y: y + 1};
 
@@ -181,7 +183,7 @@ let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
 
   if (canMap) {
     let nextStats = calcNextStats(~stats, ~strokesCount=0);
-    let nextGridState: gridState = {
+    let nextGridState: GridState.t = {
       ...gridState,
       blockPosition: nextPosition,
     };
@@ -200,7 +202,7 @@ let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
     let nextStats =
       calcNextStats(~stats, ~strokesCount=Array.length(strokeIndexes));
 
-    let nextGridState = {
+    let nextGridState: GridState.t = {
       block: nextBlock,
       blockPosition:
         calcInitBlockPosition(~block=nextBlock, ~gridWidth=getWidth(grid)),
@@ -219,7 +221,7 @@ let tick = (gridState: gridState, stats: stats, ~nextBlock=?, ()) => {
   };
 };
 
-let getNextPositionByDirection = (direction, currentPosition) => {
+let getNextPositionByDirection = (direction: Direction.t, currentPosition) => {
   let {x, y} = currentPosition;
 
   let nextPosition =
@@ -231,8 +233,9 @@ let getNextPositionByDirection = (direction, currentPosition) => {
   nextPosition;
 };
 
-let getGridStateAfterMove = (direction: direction, gridState) => {
-  let {blockPosition, block, grid} = gridState;
+let getGridStateAfterMove =
+    (direction: Direction.t, gridState: GridState.t): GridState.t => {
+  let {blockPosition, block, grid}: GridState.t = gridState;
 
   let nextPosition = getNextPositionByDirection(direction, blockPosition);
 
@@ -252,8 +255,8 @@ let rotate2dArr = (arr: array(array('a))) => {
 
 let rotateClockwise = grid => grid->Array.reverse->rotate2dArr;
 
-let getGridStateAfterRotate = gridState => {
-  let {blockPosition, block, grid} = gridState;
+let getGridStateAfterRotate = (gridState: GridState.t): GridState.t => {
+  let {blockPosition, block, grid}: GridState.t = gridState;
   let rotatedBlock = rotateClockwise(block);
 
   let canMap = canMapBlock(blockPosition, rotatedBlock, grid);
@@ -285,3 +288,12 @@ let calcDelay = level =>
   | 20 => 50
   | _ => 40
   };
+
+let nextScreen = (currentScreen: Screen.t): Screen.t => {
+  switch (currentScreen) {
+  | Title => Counter
+  | Counter => Game
+  | Game => Gameover
+  | Gameover => Counter
+  };
+};
