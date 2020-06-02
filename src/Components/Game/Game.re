@@ -46,6 +46,7 @@ let initState2 = {
 };
 
 type action =
+  | SetScreen(Screen.t)
   | StartCountdown
   | Countdown
   | SetCountdownIntervalId(option(Js.Global.intervalId));
@@ -54,6 +55,8 @@ let reducer =
     (state: state2, action: action)
     : ReludeReact.Reducer.update(action, state2) =>
   switch (action) {
+  | SetScreen(screen) => Update({...state, screen})
+
   | StartCountdown =>
     UpdateWithSideEffect(
       {...state, screen: Counter, countdownCounter: 3},
@@ -66,8 +69,9 @@ let reducer =
     )
 
   | Countdown =>
-    if (state.countdownCounter == 0) {
-      SideEffect(
+    if (state.countdownCounter == 1) {
+      UpdateWithSideEffect(
+        {...state, screen: Game},
         ({send}) => {
           Utils.clearOptionalIntervalId(state.countdownIntervalId);
           send(SetCountdownIntervalId(None));
@@ -83,11 +87,12 @@ let reducer =
 
 [@react.component]
 let make = () => {
-  let ({countdownCounter}, send) =
+  let ({countdownCounter, screen}, send) =
     ReludeReact.Reducer.useReducer(reducer, initState2);
 
+  let setScreen = screen => send(SetScreen(screen));
+
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-  let (screen, setScreen) = React.useState(() => Screen.Title);
   let (state, setState) = React.useState(() => initialGlobalState);
 
   let clearAllTimers = () => {
@@ -130,7 +135,7 @@ let make = () => {
 
       if (gameOver) {
         clearAllTimers();
-        setScreen(_ => Gameover);
+        setScreen(Gameover);
         {...state, gameOver: true};
       } else {
         let nextState = {
@@ -193,24 +198,6 @@ let make = () => {
     };
   };
 
-  let startGame = () => setScreen(_ => Core.nextScreen(screen));
-
-  React.useEffect1(
-    () => {
-      switch (screen) {
-      | Counter =>
-        switch (countdownCounter) {
-        | 0 => startGame()
-        | _ => ()
-        }
-      | _ => ()
-      };
-
-      None;
-    },
-    [|countdownCounter|],
-  );
-
   React.useEffect1(
     () =>
       if (screen == Game) {
@@ -237,7 +224,6 @@ let make = () => {
   let startCountdown = () => {
     setState(_ => initialGlobalState);
     send(StartCountdown);
-    setScreen(_ => Core.nextScreen(screen));
   };
 
   React.useEffect2(
