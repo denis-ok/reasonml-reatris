@@ -37,9 +37,12 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "bs-bastet": "^1.2.5",
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "reason-react": "^0.8.0"
+    "reason-react": "^0.8.0",
+    "relude": "^0.63.1",
+    "relude-reason-react": "^0.10.0"
   }
 }

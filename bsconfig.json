@@ -14,7 +14,13 @@
     "module": "es6",
     "in-source": true
   },
-  "bs-dependencies": ["reason-react", "bs-webapi"],
+  "bs-dependencies": [
+    "reason-react",
+    "bs-webapi",
+    "bs-bastet",
+    "relude",
+    "relude-reason-react"
+  ],
   "bs-dev-dependencies": ["@glennsl/bs-jest", "bs-react-testing-library"],
   "warnings": {
     "error": "+101"
