@@ -1,4 +1,3 @@
-module Func = Functions;
 module Const = Constants;
 
 open Types;
@@ -9,7 +8,7 @@ open Belt;
 [@bs.module "./Game.module.css"] external styles: Js.t({..}) = "default";
 
 let initGridState =
-  Func.genInitGridState(
+  Core.genInitGridState(
     ~gridWidth=Constants.Grid.width,
     ~gridHeight=Constants.Grid.height,
   );
@@ -66,21 +65,21 @@ let make = () => {
     setState(state =>
       {
         ...state,
-        gridState: Func.getGridStateAfterMove(direction, state.gridState),
+        gridState: Core.getGridStateAfterMove(direction, state.gridState),
       }
     );
   };
 
   let rotateBlock = () => {
     setState(state =>
-      {...state, gridState: Func.getGridStateAfterRotate(state.gridState)}
+      {...state, gridState: Core.getGridStateAfterRotate(state.gridState)}
     );
   };
 
   let tick = () => {
     setState(state => {
       let next =
-        Func.tick(
+        Core.tick(
           state.gridState,
           state.stats,
           ~nextBlock=state.nextBlock,
@@ -147,7 +146,7 @@ let make = () => {
     | "ArrowRight" => Utils.clearIntervalId(timers.moveRight)
     | "ArrowUp" => Utils.clearIntervalId(timers.rotate)
     | "ArrowDown" =>
-      let delay = Func.calcDelay(state.stats.level);
+      let delay = Core.calcDelay(state.stats.level);
       updateTimer(timers.tick, tick, delay);
     | _ => ()
     };
@@ -210,7 +209,7 @@ let make = () => {
     () => {
       switch (screen) {
       | Game =>
-        let delay = Func.calcDelay(state.stats.level);
+        let delay = Core.calcDelay(state.stats.level);
         updateTimer(timers.tick, tick, delay);
       | _ => ()
       };
@@ -222,7 +221,7 @@ let make = () => {
   let started = screen == Game || screen == Gameover;
 
   let gridToRender =
-    started ? Func.mapBlockToGrid(state.gridState) : initGridState.grid;
+    started ? Core.mapBlockToGrid(state.gridState) : initGridState.grid;
 
   <div className=styles##game>
     <NextBlock nextBlock={state.nextBlock} started />

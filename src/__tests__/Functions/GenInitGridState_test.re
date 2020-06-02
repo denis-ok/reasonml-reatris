@@ -1,7 +1,7 @@
 open Jest;
 open Expect;
 open Types;
-open Functions;
+open Core;
 
 describe("GenInitGridState", () => {
   let state = genInitGridState(~gridWidth=10, ~gridHeight=23);

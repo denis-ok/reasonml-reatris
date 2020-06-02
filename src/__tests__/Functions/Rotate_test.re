@@ -1,7 +1,7 @@
 open Jest;
 open Expect;
 open Types;
-open Functions;
+open Core
 
 let blockR1 =
 [|
