@@ -33,11 +33,61 @@ let initTimerIds = {
   rotate: ref(None),
 };
 
+type state2 = {
+  screen: Screen.t,
+  countdownCounter: int,
+  countdownIntervalId: option(Js.Global.intervalId),
+};
+
+let initState2 = {
+  screen: Title,
+  countdownCounter: 0,
+  countdownIntervalId: None,
+};
+
+type action =
+  | StartCountdown
+  | Countdown
+  | SetCountdownIntervalId(option(Js.Global.intervalId));
+
+let reducer =
+    (state: state2, action: action)
+    : ReludeReact.Reducer.update(action, state2) =>
+  switch (action) {
+  | StartCountdown =>
+    UpdateWithSideEffect(
+      {...state, screen: Counter, countdownCounter: 3},
+      ({send}) => {
+        let timerId =
+          Js.Global.setInterval(() => send(Countdown), Const.countDelay);
+
+        send(SetCountdownIntervalId(Some(timerId)));
+      },
+    )
+
+  | Countdown =>
+    if (state.countdownCounter == 0) {
+      SideEffect(
+        ({send}) => {
+          Utils.clearOptionalIntervalId(state.countdownIntervalId);
+          send(SetCountdownIntervalId(None));
+        },
+      );
+    } else {
+      Update({...state, countdownCounter: state.countdownCounter - 1});
+    }
+
+  | SetCountdownIntervalId(countdownIntervalId) =>
+    Update({...state, countdownIntervalId})
+  };
+
 [@react.component]
 let make = () => {
+  let ({countdownCounter}, send) =
+    ReludeReact.Reducer.useReducer(reducer, initState2);
+
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
   let (screen, setScreen) = React.useState(() => Screen.Title);
-  let (countdownCounter, setCountdownCounter) = React.useState(() => 0);
   let (state, setState) = React.useState(() => initialGlobalState);
 
   let clearAllTimers = () => {
@@ -150,18 +200,7 @@ let make = () => {
       switch (screen) {
       | Counter =>
         switch (countdownCounter) {
-        | 3 =>
-          let timerId =
-            Js.Global.setInterval(
-              () =>
-                setCountdownCounter(countdownCounter => countdownCounter - 1),
-              Const.countDelay,
-            );
-
-          timers.countdown := Some(timerId);
-        | 0 =>
-          startGame();
-          Utils.clearIntervalId(timers.countdown);
+        | 0 => startGame()
         | _ => ()
         }
       | _ => ()
@@ -197,7 +236,7 @@ let make = () => {
 
   let startCountdown = () => {
     setState(_ => initialGlobalState);
-    setCountdownCounter(_ => 3);
+    send(StartCountdown);
     setScreen(_ => Core.nextScreen(screen));
   };
 
