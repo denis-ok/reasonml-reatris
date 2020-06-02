@@ -24,8 +24,6 @@ let initialGlobalState: GlobalState.t = {
   gameOver: false,
 };
 
-type state = GlobalState.t;
-
 let initTimerIds = {
   tick: ref(None),
   countdown: ref(None),
@@ -110,36 +108,37 @@ let make = () => {
     let keyRepeated = Utils.Dom.isKeyRepeated(event);
 
     if (!keyRepeated) {
-      let key = Utils.Dom.getKeyName(event);
+      let pressedButton =
+        Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
-      switch (key) {
-      | "ArrowLeft" =>
+      switch (pressedButton) {
+      | ArrowLeft =>
         updateTimer(timers.moveLeft, () => moveBlock(Left), Const.moveDelay)
-      | "ArrowRight" =>
+      | ArrowRight =>
         updateTimer(
           timers.moveRight,
           () => moveBlock(Right),
           Const.moveDelay,
         )
-      | "ArrowUp" =>
-        updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
-      | "ArrowDown" => updateTimer(timers.tick, tick, Const.dropDelay)
-      | _ => ()
+      | ArrowUp => updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
+      | ArrowDown => updateTimer(timers.tick, tick, Const.dropDelay)
+      | Unsupported => ()
       };
     };
   };
 
   let keyUpHandler = event => {
-    let key = Utils.Dom.getKeyName(event);
+    let pressedButton =
+      Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
-    switch (key) {
-    | "ArrowLeft" => Utils.clearIntervalId(timers.moveLeft)
-    | "ArrowRight" => Utils.clearIntervalId(timers.moveRight)
-    | "ArrowUp" => Utils.clearIntervalId(timers.rotate)
-    | "ArrowDown" =>
+    switch (pressedButton) {
+    | ArrowLeft => Utils.clearIntervalId(timers.moveLeft)
+    | ArrowRight => Utils.clearIntervalId(timers.moveRight)
+    | ArrowUp => Utils.clearIntervalId(timers.rotate)
+    | ArrowDown =>
       let delay = Core.calcDelay(state.stats.level);
       updateTimer(timers.tick, tick, delay);
-    | _ => ()
+    | Unsupported => ()
     };
   };
 

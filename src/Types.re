@@ -83,3 +83,20 @@ module Direction = {
     | Left
     | Right;
 };
+
+module KeyboardButton = {
+  type t =
+    | ArrowUp
+    | ArrowRight
+    | ArrowDown
+    | ArrowLeft
+    | Unsupported;
+
+  let fromString =
+    fun
+    | "ArrowUp" => ArrowUp
+    | "ArrowRight" => ArrowRight
+    | "ArrowDown" => ArrowDown
+    | "ArrowLeft" => ArrowLeft
+    | _ => Unsupported;
+};
