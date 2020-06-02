@@ -7,14 +7,14 @@ open Belt;
 
 [@bs.module "./Game.module.css"] external styles: Js.t({..}) = "default";
 
-let initGridState =
+let initialGridState =
   Core.genInitGridState(
     ~gridWidth=Constants.Grid.width,
     ~gridHeight=Constants.Grid.height,
   );
 
-let initGlobalState: GlobalState.t = {
-  gridState: initGridState,
+let initialGlobalState: GlobalState.t = {
+  gridState: initialGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: {
     score: 0,
@@ -25,15 +25,6 @@ let initGlobalState: GlobalState.t = {
 };
 
 type state = GlobalState.t;
-
-let getNextScreen = (currentScreen: Screen.t): Screen.t => {
-  switch (currentScreen) {
-  | Title => Counter
-  | Counter => Game
-  | Game => Gameover
-  | Gameover => Counter
-  };
-};
 
 let initTimerIds = {
   tick: ref(None),
@@ -48,7 +39,7 @@ let make = () => {
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
   let (screen, setScreen) = React.useState(() => Screen.Title);
   let (countdownCounter, setCountdownCounter) = React.useState(() => 0);
-  let (state, setState) = React.useState(() => initGlobalState);
+  let (state, setState) = React.useState(() => initialGlobalState);
 
   let clearAllTimers = () => {
     [
@@ -152,7 +143,7 @@ let make = () => {
     };
   };
 
-  let startGame = () => setScreen(_ => getNextScreen(screen));
+  let startGame = () => setScreen(_ => Core.nextScreen(screen));
 
   React.useEffect(() => {
     if (screen == Counter) {
@@ -199,9 +190,9 @@ let make = () => {
   );
 
   let startCountdown = () => {
-    setState(_ => initGlobalState);
+    setState(_ => initialGlobalState);
     setCountdownCounter(_ => 3);
-    setScreen(_ => getNextScreen(screen));
+    setScreen(_ => Core.nextScreen(screen));
   };
 
   // Use Tick
@@ -221,7 +212,7 @@ let make = () => {
   let started = screen == Game || screen == Gameover;
 
   let gridToRender =
-    started ? Core.mapBlockToGrid(state.gridState) : initGridState.grid;
+    started ? Core.mapBlockToGrid(state.gridState) : initialGridState.grid;
 
   <div className=styles##game>
     <NextBlock nextBlock={state.nextBlock} started />

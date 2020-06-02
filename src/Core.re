@@ -288,3 +288,12 @@ let calcDelay = level =>
   | 20 => 50
   | _ => 40
   };
+
+let nextScreen = (currentScreen: Screen.t): Screen.t => {
+  switch (currentScreen) {
+  | Title => Counter
+  | Counter => Game
+  | Game => Gameover
+  | Gameover => Counter
+  };
+};
