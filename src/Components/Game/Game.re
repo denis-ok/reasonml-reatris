@@ -145,27 +145,33 @@ let make = () => {
 
   let startGame = () => setScreen(_ => Core.nextScreen(screen));
 
-  React.useEffect(() => {
-    if (screen == Counter) {
-      if (countdownCounter > 0) {
-        let timerId =
-          Js.Global.setInterval(
-            () =>
-              setCountdownCounter(countdownCounter => countdownCounter - 1),
-            Const.countDelay,
-          );
-        timers.countdown := Some(timerId);
-      } else {
-        startGame();
+  React.useEffect1(
+    () => {
+      switch (screen) {
+      | Counter =>
+        switch (countdownCounter) {
+        | 3 =>
+          let timerId =
+            Js.Global.setInterval(
+              () =>
+                setCountdownCounter(countdownCounter => countdownCounter - 1),
+              Const.countDelay,
+            );
+
+          timers.countdown := Some(timerId);
+        | 0 =>
+          startGame();
+          Utils.clearIntervalId(timers.countdown);
+        | _ => ()
+        }
+      | _ => ()
       };
-    } else {
-      ();
-    };
 
-    Some(() => Utils.clearIntervalId(timers.countdown));
-  });
+      None;
+    },
+    [|countdownCounter|],
+  );
 
-  //Use keyboard
   React.useEffect1(
     () =>
       if (screen == Game) {
@@ -195,7 +201,6 @@ let make = () => {
     setScreen(_ => Core.nextScreen(screen));
   };
 
-  // Use Tick
   React.useEffect2(
     () => {
       switch (screen) {
