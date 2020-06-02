@@ -18,3 +18,8 @@ let clearIntervalId = (id: Types.intervalId) =>
   | Some(id) => Js.Global.clearInterval(id)
   | None => ()
   };
+
+module React = {
+  let (&&&) = (condition: bool, element: React.element) =>
+    if (condition) {element} else {React.null};
+};

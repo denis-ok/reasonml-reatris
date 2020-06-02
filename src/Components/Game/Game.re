@@ -2,6 +2,7 @@ module Const = Constants;
 
 open Types;
 open Belt;
+open Utils.React;
 
 [@bs.val] external document: Dom.document = "document";
 
@@ -214,7 +215,7 @@ let make = () => {
     started ? Core.mapBlockToGrid(state.gridState) : initialGridState.grid;
 
   <div className=styles##game>
-    <NextBlock nextBlock={state.nextBlock} started />
+    {started &&& <NextBlock nextBlock={state.nextBlock} />}
     <div className=styles##gridContainer>
       <Grid grid=gridToRender />
       <GridOverlay
@@ -223,6 +224,6 @@ let make = () => {
         clickStart={_event => startCountdown()}
       />
     </div>
-    <Stats stats={state.stats} started />
+    {started &&& <Stats stats={state.stats} />}
   </div>;
 };
