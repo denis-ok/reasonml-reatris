@@ -17,7 +17,7 @@ module TitleScreen = {
 
 module CounterScreen = {
   [@react.component]
-  let make = (~countdownCounter: countdownCounter) =>
+  let make = (~countdownCounter: int) =>
     <p className=styles##number>
       {React.string(Int.toString(countdownCounter))}
     </p>;

@@ -13,12 +13,6 @@ module Dom = {
   };
 };
 
-let clearIntervalId = (id: Types.intervalId) =>
-  switch (id^) {
-  | Some(id) => Js.Global.clearInterval(id)
-  | None => ()
-  };
-
 let clearOptionalIntervalId = (intervalId: option(Js.Global.intervalId)) =>
   switch (intervalId) {
   | Some(id) => Js.Global.clearInterval(id)

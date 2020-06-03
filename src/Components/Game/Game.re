@@ -1,6 +1,7 @@
 module Const = Constants;
 
 open Types;
+open Types.GlobalState;
 open Utils.React;
 
 [@bs.val] external document: Dom.document = "document";
@@ -13,45 +14,18 @@ let initialGridState =
     ~gridHeight=Constants.Grid.height,
   );
 
-let initialGlobalState: GlobalState.t = {
-  gridState: initialGridState,
-  nextBlock: Blocks.getRandomBlock(),
-  stats: {
-    score: 0,
-    lines: 0,
-    level: 1,
-  },
-  gameOver: false,
-};
-
-let initTimerIds = {
-  tick: ref(None),
-  countdown: ref(None),
-  moveLeft: ref(None),
-  moveRight: ref(None),
-  rotate: ref(None),
-};
-
-type state2 = {
-  screen: Screen.t,
-  countdownCounter: int,
-  countdownIntervalId: option(Js.Global.intervalId),
-  stats: GameStats.t,
-  gridState: GridState.t,
-  nextBlock: block,
-};
-
-let initState2 = {
+let initGlobalState: GlobalState.t = {
   screen: Title,
   countdownCounter: 0,
   countdownIntervalId: None,
+  gridState: initialGridState,
+  nextBlock: Blocks.getRandomBlock(),
   stats: {
     score: 0,
     lines: 0,
     level: 1,
   },
-  gridState: initialGridState,
-  nextBlock: Blocks.getRandomBlock(),
+  timers: Timer.State.empty,
 };
 
 type action =
@@ -61,11 +35,14 @@ type action =
   | SetCountdownIntervalId(option(Js.Global.intervalId))
   | Tick
   | MoveBlock(Direction.t)
-  | RotateBlock;
+  | RotateBlock
+  | InitTimer(Timer.t, int)
+  | SetTimer(Timer.t, option(Js.Global.intervalId))
+  | ClearTimer(Timer.t);
 
 let reducer =
-    (state: state2, action: action)
-    : ReludeReact.Reducer.update(action, state2) =>
+    (state: GlobalState.t, action: action)
+    : ReludeReact.Reducer.update(action, GlobalState.t) =>
   switch (action) {
   | SetScreen(screen) => Update({...state, screen})
 
@@ -128,37 +105,59 @@ let reducer =
   | RotateBlock =>
     let nextGridState = Core.getGridStateAfterRotate(state.gridState);
     Update({...state, gridState: nextGridState});
+
+  | InitTimer(timer, delay) =>
+    SideEffect(
+      ({send}) => {
+        let action =
+          switch (timer) {
+          | Tick => Tick
+          | Countdown => Countdown
+          | MoveLeft => MoveBlock(Left)
+          | MoveRight => MoveBlock(Right)
+          | Rotate => RotateBlock
+          };
+
+        let intervalId = Js.Global.setInterval(() => send(action), delay);
+
+        send(SetTimer(timer, Some(intervalId)));
+      },
+    )
+
+  | SetTimer(timer, value) =>
+    let newTimers =
+      switch (timer) {
+      | Tick => {...state.timers, tick: value}
+      | Countdown => {...state.timers, countdown: value}
+      | MoveLeft => {...state.timers, moveLeft: value}
+      | MoveRight => {...state.timers, moveRight: value}
+      | Rotate => {...state.timers, rotate: value}
+      };
+
+    Update({...state, timers: newTimers});
+
+  | ClearTimer(timer) =>
+    SideEffect(
+      ({send}) => {
+        let intervalId =
+          switch (timer) {
+          | Tick => state.timers.tick
+          | Countdown => state.timers.countdown
+          | MoveLeft => state.timers.moveLeft
+          | MoveRight => state.timers.moveRight
+          | Rotate => state.timers.rotate
+          };
+
+        Utils.clearOptionalIntervalId(intervalId);
+        send(SetTimer(timer, None));
+      },
+    )
   };
 
 [@react.component]
 let make = () => {
   let ({countdownCounter, screen, gridState, nextBlock, stats}, send) =
-    ReludeReact.Reducer.useReducer(reducer, initState2);
-
-  let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-
-  let tick = () => send(Tick);
-
-  // let clearAllTimers = () => {
-  //   [
-  //     timers.tick,
-  //     timers.moveLeft,
-  //     timers.moveRight,
-  //     timers.rotate,
-  //     timers.countdown,
-  //   ]
-  //   ->(List.forEach(Utils.clearIntervalId));
-  // };
-
-  let moveBlock = direction => send(MoveBlock(direction));
-
-  let rotateBlock = () => send(RotateBlock);
-
-  let updateTimer = (timerId, callback, delay) => {
-    Utils.clearIntervalId(timerId);
-    let newTimerId = Js.Global.setInterval(() => callback(), delay);
-    timerId := Some(newTimerId);
-  };
+    ReludeReact.Reducer.useReducer(reducer, initGlobalState);
 
   let keyDownHandler = event => {
     let keyRepeated = Utils.Dom.isKeyRepeated(event);
@@ -168,16 +167,10 @@ let make = () => {
         Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
       switch (pressedButton) {
-      | ArrowLeft =>
-        updateTimer(timers.moveLeft, () => moveBlock(Left), Const.moveDelay)
-      | ArrowRight =>
-        updateTimer(
-          timers.moveRight,
-          () => moveBlock(Right),
-          Const.moveDelay,
-        )
-      | ArrowUp => updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
-      | ArrowDown => updateTimer(timers.tick, tick, Const.dropDelay)
+      | ArrowLeft => InitTimer(MoveLeft, Const.moveDelay)->send
+      | ArrowRight => InitTimer(MoveRight, Const.moveDelay)->send
+      | ArrowUp => InitTimer(Rotate, Const.rotateDelay)->send
+      | ArrowDown => InitTimer(Tick, Const.dropDelay)->send
       | Unsupported => ()
       };
     };
@@ -188,12 +181,10 @@ let make = () => {
       Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
     switch (pressedButton) {
-    | ArrowLeft => Utils.clearIntervalId(timers.moveLeft)
-    | ArrowRight => Utils.clearIntervalId(timers.moveRight)
-    | ArrowUp => Utils.clearIntervalId(timers.rotate)
-    | ArrowDown =>
-      let delay = Core.calcDelay(stats.level);
-      updateTimer(timers.tick, tick, delay);
+    | ArrowLeft => ClearTimer(MoveLeft)->send
+    | ArrowRight => ClearTimer(MoveRight)->send
+    | ArrowUp => ClearTimer(Rotate)->send
+    | ArrowDown => ClearTimer(Tick)->send
     | Unsupported => ()
     };
   };
@@ -226,12 +217,19 @@ let make = () => {
       switch (screen) {
       | Game =>
         let delay = Core.calcDelay(stats.level);
+        InitTimer(Tick, delay)->send;
 
-        updateTimer(timers.tick, tick, delay);
-        None;
-      | Gameover => Some(() => Utils.clearIntervalId(timers.tick))
-      | _ => None
-      }
+      | Gameover =>
+        ClearTimer(MoveLeft)->send;
+        ClearTimer(MoveRight)->send;
+        ClearTimer(Rotate)->send;
+        ClearTimer(Tick)->send;
+
+      | Title
+      | Counter => ()
+      };
+
+      None;
     },
     [|screen|],
   );
