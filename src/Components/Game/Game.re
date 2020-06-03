@@ -1,7 +1,6 @@
 module Const = Constants;
 
 open Types;
-open Belt;
 open Utils.React;
 
 [@bs.val] external document: Dom.document = "document";
@@ -37,19 +36,32 @@ type state2 = {
   screen: Screen.t,
   countdownCounter: int,
   countdownIntervalId: option(Js.Global.intervalId),
+  stats: GameStats.t,
+  gridState: GridState.t,
+  nextBlock: block,
 };
 
 let initState2 = {
   screen: Title,
   countdownCounter: 0,
   countdownIntervalId: None,
+  stats: {
+    score: 0,
+    lines: 0,
+    level: 1,
+  },
+  gridState: initialGridState,
+  nextBlock: Blocks.getRandomBlock(),
 };
 
 type action =
   | SetScreen(Screen.t)
   | StartCountdown
   | Countdown
-  | SetCountdownIntervalId(option(Js.Global.intervalId));
+  | SetCountdownIntervalId(option(Js.Global.intervalId))
+  | Tick
+  | MoveBlock(Direction.t)
+  | RotateBlock;
 
 let reducer =
     (state: state2, action: action)
@@ -59,7 +71,18 @@ let reducer =
 
   | StartCountdown =>
     UpdateWithSideEffect(
-      {...state, screen: Counter, countdownCounter: 3},
+      {
+        ...state,
+        screen: Counter,
+        countdownCounter: 3,
+        gridState: initialGridState,
+        stats: {
+          score: 0,
+          lines: 0,
+          level: 1,
+        },
+        nextBlock: Blocks.getRandomBlock(),
+      },
       ({send}) => {
         let timerId =
           Js.Global.setInterval(() => send(Countdown), Const.countDelay);
@@ -83,76 +106,53 @@ let reducer =
 
   | SetCountdownIntervalId(countdownIntervalId) =>
     Update({...state, countdownIntervalId})
+
+  | Tick =>
+    let next =
+      Core.tick(state.gridState, state.stats, ~nextBlock=state.nextBlock, ());
+
+    let {gridState, stats, gameOver, nextBlockToShow}: TickOutput.t = next;
+
+    if (gameOver) {
+      Update({...state, screen: Gameover});
+    } else {
+      Update({...state, nextBlock: nextBlockToShow, gridState, stats});
+    };
+
+  | MoveBlock(direction) =>
+    let nextGridState =
+      Core.getGridStateAfterMove(direction, state.gridState);
+
+    Update({...state, gridState: nextGridState});
+
+  | RotateBlock =>
+    let nextGridState = Core.getGridStateAfterRotate(state.gridState);
+    Update({...state, gridState: nextGridState});
   };
 
 [@react.component]
 let make = () => {
-  let ({countdownCounter, screen}, send) =
+  let ({countdownCounter, screen, gridState, nextBlock, stats}, send) =
     ReludeReact.Reducer.useReducer(reducer, initState2);
 
-  let setScreen = screen => send(SetScreen(screen));
-
   let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-  let (state, setState) = React.useState(() => initialGlobalState);
 
-  let clearAllTimers = () => {
-    [
-      timers.tick,
-      timers.moveLeft,
-      timers.moveRight,
-      timers.rotate,
-      timers.countdown,
-    ]
-    ->(List.forEach(Utils.clearIntervalId));
-  };
+  let tick = () => send(Tick);
 
-  let moveBlock = direction => {
-    setState(state =>
-      {
-        ...state,
-        gridState: Core.getGridStateAfterMove(direction, state.gridState),
-      }
-    );
-  };
+  // let clearAllTimers = () => {
+  //   [
+  //     timers.tick,
+  //     timers.moveLeft,
+  //     timers.moveRight,
+  //     timers.rotate,
+  //     timers.countdown,
+  //   ]
+  //   ->(List.forEach(Utils.clearIntervalId));
+  // };
 
-  let rotateBlock = () => {
-    setState(state =>
-      {...state, gridState: Core.getGridStateAfterRotate(state.gridState)}
-    );
-  };
+  let moveBlock = direction => send(MoveBlock(direction));
 
-  let tick = () => {
-    setState(state => {
-      let next =
-        Core.tick(
-          state.gridState,
-          state.stats,
-          ~nextBlock=state.nextBlock,
-          (),
-        );
-
-      let {gridState, stats, gameOver, nextBlockToShow}: TickOutput.t = next;
-
-      if (gameOver) {
-        clearAllTimers();
-        setScreen(Gameover);
-        {...state, gameOver: true};
-      } else {
-        let nextState = {
-          ...state,
-          nextBlock: nextBlockToShow,
-          gridState,
-          stats,
-        };
-
-        if (state.stats.level < next.stats.level) {
-          nextState;
-        } else {
-          nextState;
-        };
-      };
-    });
-  };
+  let rotateBlock = () => send(RotateBlock);
 
   let updateTimer = (timerId, callback, delay) => {
     Utils.clearIntervalId(timerId);
@@ -192,7 +192,7 @@ let make = () => {
     | ArrowRight => Utils.clearIntervalId(timers.moveRight)
     | ArrowUp => Utils.clearIntervalId(timers.rotate)
     | ArrowDown =>
-      let delay = Core.calcDelay(state.stats.level);
+      let delay = Core.calcDelay(stats.level);
       updateTimer(timers.tick, tick, delay);
     | Unsupported => ()
     };
@@ -221,39 +221,36 @@ let make = () => {
     [|screen|],
   );
 
-  let startCountdown = () => {
-    setState(_ => initialGlobalState);
-    send(StartCountdown);
-  };
-
-  React.useEffect2(
+  React.useEffect1(
     () => {
       switch (screen) {
       | Game =>
-        let delay = Core.calcDelay(state.stats.level);
+        let delay = Core.calcDelay(stats.level);
+
         updateTimer(timers.tick, tick, delay);
-      | _ => ()
-      };
-      Some(() => Utils.clearIntervalId(timers.tick));
+        None;
+      | Gameover => Some(() => Utils.clearIntervalId(timers.tick))
+      | _ => None
+      }
     },
-    (screen, state.stats.level),
+    [|screen|],
   );
 
   let started = screen == Game || screen == Gameover;
 
   let gridToRender =
-    started ? Core.mapBlockToGrid(state.gridState) : initialGridState.grid;
+    started ? Core.mapBlockToGrid(gridState) : initialGridState.grid;
 
   <div className=styles##game>
-    {started &&& <NextBlock nextBlock={state.nextBlock} />}
+    {started &&& <NextBlock nextBlock />}
     <div className=styles##gridContainer>
       <Grid grid=gridToRender />
       <GridOverlay
         screen
         countdownCounter
-        clickStart={_event => startCountdown()}
+        clickStart={_event => send(StartCountdown)}
       />
     </div>
-    {started &&& <Stats stats={state.stats} />}
+    {started &&& <Stats stats />}
   </div>;
 };
