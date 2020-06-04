@@ -170,7 +170,9 @@ let make = () => {
       | ArrowLeft => InitTimer(MoveLeft, Const.moveDelay)->send
       | ArrowRight => InitTimer(MoveRight, Const.moveDelay)->send
       | ArrowUp => InitTimer(Rotate, Const.rotateDelay)->send
-      | ArrowDown => InitTimer(Tick, Const.dropDelay)->send
+      | ArrowDown =>
+        ClearTimer(Tick)->send;
+        InitTimer(Tick, Const.dropDelay)->send;
       | Unsupported => ()
       };
     };
@@ -184,49 +186,42 @@ let make = () => {
     | ArrowLeft => ClearTimer(MoveLeft)->send
     | ArrowRight => ClearTimer(MoveRight)->send
     | ArrowUp => ClearTimer(Rotate)->send
-    | ArrowDown => ClearTimer(Tick)->send
+    | ArrowDown =>
+      ClearTimer(Tick)->send;
+      InitTimer(Tick, Core.calcDelay(stats.level))->send;
     | Unsupported => ()
     };
   };
 
+  let (keyUpHandler, _) = React.useState(_ => keyUpHandler);
+  let (keyDownHandler, _) = React.useState(_ => keyDownHandler);
+
   React.useEffect1(
-    () =>
-      if (screen == Game) {
+    () => {
+      switch (screen) {
+      | Game =>
         Utils.Dom.addKeyboardListeners(
           ~keyDownHandler,
           ~keyUpHandler,
           document,
         );
 
-        Some(
-          () =>
-            Utils.Dom.removeKeyboardListeners(
-              ~keyDownHandler,
-              ~keyUpHandler,
-              document,
-            ),
-        );
-      } else {
-        None;
-      },
-    [|screen|],
-  );
-
-  React.useEffect1(
-    () => {
-      switch (screen) {
-      | Game =>
         let delay = Core.calcDelay(stats.level);
+
         InitTimer(Tick, delay)->send;
 
       | Gameover =>
+        Utils.Dom.removeKeyboardListeners(
+          ~keyDownHandler,
+          ~keyUpHandler,
+          document,
+        );
+
+        ClearTimer(Tick)->send;
         ClearTimer(MoveLeft)->send;
         ClearTimer(MoveRight)->send;
         ClearTimer(Rotate)->send;
-        ClearTimer(Tick)->send;
-
-      | Title
-      | Counter => ()
+      | _ => ()
       };
 
       None;
