@@ -17,7 +17,6 @@ let initialGridState =
 let initGlobalState: GlobalState.t = {
   screen: Title,
   countdownCounter: 0,
-  countdownIntervalId: None,
   gridState: initialGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: {
@@ -32,7 +31,6 @@ type action =
   | SetScreen(Screen.t)
   | StartCountdown
   | Countdown
-  | SetCountdownIntervalId(option(Js.Global.intervalId))
   | ScheduleTick
   | Tick
   | MoveBlock(Direction.t)
@@ -61,29 +59,18 @@ let reducer =
         },
         nextBlock: Blocks.getRandomBlock(),
       },
-      ({send}) => {
-        let timerId =
-          Js.Global.setInterval(() => send(Countdown), Const.countDelay);
-
-        send(SetCountdownIntervalId(Some(timerId)));
-      },
+      ({send}) => send(InitTimer(Countdown, Const.countDelay)),
     )
 
   | Countdown =>
     if (state.countdownCounter == 1) {
       UpdateWithSideEffect(
         {...state, screen: Game},
-        ({send}) => {
-          Utils.clearOptionalIntervalId(state.countdownIntervalId);
-          send(SetCountdownIntervalId(None));
-        },
+        ({send}) => send(ClearTimer(Countdown)),
       );
     } else {
       Update({...state, countdownCounter: state.countdownCounter - 1});
     }
-
-  | SetCountdownIntervalId(countdownIntervalId) =>
-    Update({...state, countdownIntervalId})
 
   | Tick =>
     let next =
@@ -125,14 +112,14 @@ let reducer =
       },
     )
 
-  | SetTimer(timer, value) =>
+  | SetTimer(timer, mbTimerId) =>
     let newTimers =
       switch (timer) {
-      | Tick => {...state.timers, tick: value}
-      | Countdown => {...state.timers, countdown: value}
-      | MoveLeft => {...state.timers, moveLeft: value}
-      | MoveRight => {...state.timers, moveRight: value}
-      | Rotate => {...state.timers, rotate: value}
+      | Tick => {...state.timers, tick: mbTimerId}
+      | Countdown => {...state.timers, countdown: mbTimerId}
+      | MoveLeft => {...state.timers, moveLeft: mbTimerId}
+      | MoveRight => {...state.timers, moveRight: mbTimerId}
+      | Rotate => {...state.timers, rotate: mbTimerId}
       };
 
     Update({...state, timers: newTimers});

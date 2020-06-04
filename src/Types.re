@@ -86,7 +86,6 @@ module GlobalState = {
   type t = {
     screen: Screen.t,
     countdownCounter: int,
-    countdownIntervalId: option(Js.Global.intervalId),
     stats: GameStats.t,
     gridState: GridState.t,
     nextBlock: block,
