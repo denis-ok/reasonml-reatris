@@ -234,15 +234,13 @@ let make = () => {
   let gridToRender =
     started ? Core.mapBlockToGrid(gridState) : initialGridState.grid;
 
+  let onClickStart = () => send(StartCountdown);
+
   <div className=styles##game>
     {started &&& <NextBlock nextBlock />}
     <div className=styles##gridContainer>
       <Grid grid=gridToRender />
-      <GridOverlay
-        screen
-        countdownCounter
-        clickStart={_event => send(StartCountdown)}
-      />
+      <GridOverlay screen countdownCounter onClickStart />
     </div>
     {started &&& <Stats stats />}
   </div>;
