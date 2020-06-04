@@ -33,6 +33,7 @@ type action =
   | StartCountdown
   | Countdown
   | SetCountdownIntervalId(option(Js.Global.intervalId))
+  | ScheduleTick
   | Tick
   | MoveBlock(Direction.t)
   | RotateBlock
@@ -152,6 +153,14 @@ let reducer =
         send(SetTimer(timer, None));
       },
     )
+
+  | ScheduleTick =>
+    SideEffect(
+      ({send}) => {
+        let delay = Core.calcDelay(state.stats.level);
+        send(InitTimer(Tick, delay));
+      },
+    )
   };
 
 [@react.component]
@@ -188,7 +197,7 @@ let make = () => {
     | ArrowUp => ClearTimer(Rotate)->send
     | ArrowDown =>
       ClearTimer(Tick)->send;
-      InitTimer(Tick, Core.calcDelay(stats.level))->send;
+      ScheduleTick->send;
     | Unsupported => ()
     };
   };
@@ -206,9 +215,7 @@ let make = () => {
           document,
         );
 
-        let delay = Core.calcDelay(stats.level);
-
-        InitTimer(Tick, delay)->send;
+        ScheduleTick->send;
 
       | Gameover =>
         Utils.Dom.removeKeyboardListeners(
@@ -227,6 +234,18 @@ let make = () => {
       None;
     },
     [|screen|],
+  );
+
+  React.useEffect1(
+    () => {
+      if (stats.level > 1) {
+        ClearTimer(Tick)->send;
+        ScheduleTick->send;
+      };
+
+      None;
+    },
+    [|stats.level|],
   );
 
   let started = screen == Game || screen == Gameover;

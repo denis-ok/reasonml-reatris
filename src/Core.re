@@ -264,30 +264,8 @@ let getGridStateAfterRotate = (gridState: GridState.t): GridState.t => {
   canMap ? {...gridState, block: rotatedBlock} : gridState;
 };
 
-let calcDelay = level =>
-  switch (level) {
-  | 1 => 600
-  | 2 => 550
-  | 3 => 500
-  | 4 => 450
-  | 5 => 400
-  | 6 => 350
-  | 7 => 300
-  | 8 => 250
-  | 9 => 200
-  | 10 => 150
-  | 11 => 140
-  | 12 => 130
-  | 13 => 120
-  | 14 => 110
-  | 15 => 100
-  | 16 => 90
-  | 17 => 80
-  | 18 => 70
-  | 19 => 60
-  | 20 => 50
-  | _ => 40
-  };
+let calcDelay = (level: int) =>
+  (500.0 /. Float.fromInt(level))->Int.fromFloat;
 
 let nextScreen = (currentScreen: Screen.t): Screen.t => {
   switch (currentScreen) {
