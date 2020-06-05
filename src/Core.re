@@ -1,4 +1,5 @@
 open Types;
+open Types.Cell;
 open Belt;
 
 let getWidth = (grid: grid) => grid->Array.getUnsafe(0)->Array.size;
@@ -89,7 +90,7 @@ let mapBlockToGrid = ({blockPosition, block, grid}: GridState.t) => {
 let getStrokeIndexes = (grid: grid) => {
   let checkRow = gridRow =>
     gridRow->Array.reduce(true, (acc, elem) =>
-      switch (acc, elem) {
+      switch (acc, elem: Cell.t) {
       | (true, X) => true
       | (_, _) => false
       }

@@ -1,7 +1,7 @@
 open Jest;
 open Expect;
-open Types;
-open Core
+open Types.Cell;
+open Core;
 
 let testBlock = [|[|X, X, X|], [|O, X, O|]|];
 

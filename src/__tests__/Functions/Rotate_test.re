@@ -1,49 +1,19 @@
 open Jest;
 open Expect;
-open Types;
-open Core
+open Types.Cell;
+open Core;
 
-let blockR1 =
-[|
-[|X, X, X|],
-[|O, X, O|],
-|];
+let blockR1 = [|[|X, X, X|], [|O, X, O|]|];
 
-let blockR2 =
-[|
-[|O, X|],
-[|X, X|],
-[|O, X|],
-|];
+let blockR2 = [|[|O, X|], [|X, X|], [|O, X|]|];
 
-let m1 =
-[|
-[|1, 2, 3|],
-[|4, 5, 6|],
-[|7, 8, 9|],
-|];
+let m1 = [|[|1, 2, 3|], [|4, 5, 6|], [|7, 8, 9|]|];
 
-let m2 =
-[|
-[|7, 4, 1|],
-[|8, 5, 2|],
-[|9, 6, 3|],
-|];
+let m2 = [|[|7, 4, 1|], [|8, 5, 2|], [|9, 6, 3|]|];
 
-let m3 =
-[|
-[|9, 8, 7|],
-[|6, 5, 4|],
-[|3, 2, 1|],
-|];
+let m3 = [|[|9, 8, 7|], [|6, 5, 4|], [|3, 2, 1|]|];
 
-let m4 =
-[|
-[|3, 6, 9|],
-[|2, 5, 8|],
-[|1, 4, 7|],
-|];
-
+let m4 = [|[|3, 6, 9|], [|2, 5, 8|], [|1, 4, 7|]|];
 
 let () =
   describe("Rotate block", () => {
@@ -73,7 +43,8 @@ let () =
     });
 
     test("Should fully rotate Block", () => {
-      let result = blockR1
+      let result =
+        blockR1
         |> rotateClockwise
         |> rotateClockwise
         |> rotateClockwise

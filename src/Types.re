@@ -1,8 +1,10 @@
-type cell =
-  | O
-  | X;
+module Cell = {
+  type t =
+    | O
+    | X;
+};
 
-type row = array(cell);
+type row = array(Cell.t);
 
 type grid = array(row);
 

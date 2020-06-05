@@ -5,7 +5,7 @@ open Belt;
 
 module Tile = {
   [@react.component]
-  let make = (~cell: cell) => {
+  let make = (~cell: Cell.t) => {
     let className =
       switch (cell) {
       | O => styles##cell
