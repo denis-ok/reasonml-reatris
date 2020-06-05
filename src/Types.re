@@ -13,13 +13,6 @@ type blockPosition = {
   y: int,
 };
 
-type blockSize = {
-  width: int,
-  height: int,
-};
-
-type nextBlock = block;
-
 module Timer = {
   type t =
     | Tick
