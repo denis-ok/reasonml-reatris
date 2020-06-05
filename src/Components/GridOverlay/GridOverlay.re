@@ -1,4 +1,3 @@
-open Types;
 open Belt;
 
 [@bs.module "./GridOverlay.module.css"]
@@ -6,10 +5,10 @@ external styles: Js.t({..}) = "default";
 
 module TitleScreen = {
   [@react.component]
-  let make = (~clickStart) =>
+  let make = (~onClickStart) =>
     <>
       <h2 className=styles##titleHeading> {React.string("REATRIS")} </h2>
-      <div className=styles##btn onClick=clickStart>
+      <div className=styles##btn onClick=onClickStart>
         <p> {React.string("Start Game")} </p>
       </div>
     </>;
@@ -17,7 +16,7 @@ module TitleScreen = {
 
 module CounterScreen = {
   [@react.component]
-  let make = (~countdownCounter: countdownCounter) =>
+  let make = (~countdownCounter: int) =>
     <p className=styles##number>
       {React.string(Int.toString(countdownCounter))}
     </p>;
@@ -25,19 +24,31 @@ module CounterScreen = {
 
 module GameoverScreen = {
   [@react.component]
-  let make = (~clickStart) =>
-    <div className=styles##btn onClick=clickStart>
+  let make = (~onClickStart) =>
+    <div className=styles##btn onClick=onClickStart>
       <p> {React.string("Play Again?")} </p>
     </div>;
 };
 
 [@react.component]
-let make = (~screen: Screen.t, ~countdownCounter, ~clickStart) =>
+let make =
+    (
+      ~screen: Types.Screen.t,
+      ~countdownCounter: int,
+      ~onClickStart: unit => unit,
+    ) => {
+  let onClickStart = event => {
+    ReactEvent.Mouse.preventDefault(event);
+    ReactEvent.Mouse.stopPropagation(event);
+    onClickStart();
+  };
+
   <div className=styles##gridOverlay>
     {switch (screen) {
-     | Title => <TitleScreen clickStart />
+     | Title => <TitleScreen onClickStart />
      | Counter => <CounterScreen countdownCounter />
      | Game => React.null
-     | Gameover => <GameoverScreen clickStart />
+     | Gameover => <GameoverScreen onClickStart />
      }}
   </div>;
+};

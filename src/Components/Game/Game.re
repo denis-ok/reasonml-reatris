@@ -1,7 +1,8 @@
 module Const = Constants;
 
 open Types;
-open Belt;
+open Types.GlobalState;
+open Utils.React;
 
 [@bs.val] external document: Dom.document = "document";
 
@@ -13,7 +14,9 @@ let initialGridState =
     ~gridHeight=Constants.Grid.height,
   );
 
-let initialGlobalState: GlobalState.t = {
+let initGlobalState: GlobalState.t = {
+  screen: Title,
+  countdownCounter: 0,
   gridState: initialGridState,
   nextBlock: Blocks.getRandomBlock(),
   stats: {
@@ -21,88 +24,136 @@ let initialGlobalState: GlobalState.t = {
     lines: 0,
     level: 1,
   },
-  gameOver: false,
+  timers: Timer.State.empty,
 };
 
-let initTimerIds = {
-  tick: ref(None),
-  countdown: ref(None),
-  moveLeft: ref(None),
-  moveRight: ref(None),
-  rotate: ref(None),
-};
+type action =
+  | SetScreen(Screen.t)
+  | StartCountdown
+  | Countdown
+  | ScheduleTick
+  | Tick
+  | MoveBlock(Direction.t)
+  | RotateBlock
+  | InitTimer(Timer.t, int)
+  | SetTimer(Timer.t, option(Js.Global.intervalId))
+  | ClearTimer(Timer.t);
+
+let reducer =
+    (state: GlobalState.t, action: action)
+    : ReludeReact.Reducer.update(action, GlobalState.t) =>
+  switch (action) {
+  | SetScreen(screen) => Update({...state, screen})
+
+  | StartCountdown =>
+    UpdateWithSideEffect(
+      {
+        ...state,
+        screen: Counter,
+        countdownCounter: 3,
+        gridState: initialGridState,
+        stats: {
+          score: 0,
+          lines: 0,
+          level: 1,
+        },
+        nextBlock: Blocks.getRandomBlock(),
+      },
+      ({send}) => send(InitTimer(Countdown, Const.countDelay)),
+    )
+
+  | Countdown =>
+    if (state.countdownCounter == 1) {
+      UpdateWithSideEffect(
+        {...state, screen: Game},
+        ({send}) => send(ClearTimer(Countdown)),
+      );
+    } else {
+      Update({...state, countdownCounter: state.countdownCounter - 1});
+    }
+
+  | Tick =>
+    let next =
+      Core.tick(state.gridState, state.stats, ~nextBlock=state.nextBlock, ());
+
+    let {gridState, stats, gameOver, nextBlockToShow}: TickOutput.t = next;
+
+    if (gameOver) {
+      Update({...state, screen: Gameover});
+    } else {
+      Update({...state, nextBlock: nextBlockToShow, gridState, stats});
+    };
+
+  | MoveBlock(direction) =>
+    let nextGridState =
+      Core.getGridStateAfterMove(direction, state.gridState);
+
+    Update({...state, gridState: nextGridState});
+
+  | RotateBlock =>
+    let nextGridState = Core.getGridStateAfterRotate(state.gridState);
+    Update({...state, gridState: nextGridState});
+
+  | InitTimer(timer, delay) =>
+    SideEffect(
+      ({send}) => {
+        let action =
+          switch (timer) {
+          | Tick => Tick
+          | Countdown => Countdown
+          | MoveLeft => MoveBlock(Left)
+          | MoveRight => MoveBlock(Right)
+          | Rotate => RotateBlock
+          };
+
+        let intervalId = Js.Global.setInterval(() => send(action), delay);
+
+        send(SetTimer(timer, Some(intervalId)));
+      },
+    )
+
+  | SetTimer(timer, mbTimerId) =>
+    let newTimers =
+      switch (timer) {
+      | Tick => {...state.timers, tick: mbTimerId}
+      | Countdown => {...state.timers, countdown: mbTimerId}
+      | MoveLeft => {...state.timers, moveLeft: mbTimerId}
+      | MoveRight => {...state.timers, moveRight: mbTimerId}
+      | Rotate => {...state.timers, rotate: mbTimerId}
+      };
+
+    Update({...state, timers: newTimers});
+
+  | ClearTimer(timer) =>
+    SideEffect(
+      ({send}) => {
+        let intervalId =
+          switch (timer) {
+          | Tick => state.timers.tick
+          | Countdown => state.timers.countdown
+          | MoveLeft => state.timers.moveLeft
+          | MoveRight => state.timers.moveRight
+          | Rotate => state.timers.rotate
+          };
+
+        Utils.clearOptionalIntervalId(intervalId);
+        send(SetTimer(timer, None));
+      },
+    )
+
+  | ScheduleTick =>
+    SideEffect(
+      ({send}) => {
+        let delay = Core.calcDelay(state.stats.level);
+        send(InitTimer(Tick, delay));
+      },
+    )
+  };
 
 [@react.component]
 let make = () => {
-  let (timers: timerIds, _setTimer) = React.useState(() => initTimerIds);
-  let (screen, setScreen) = React.useState(() => Screen.Title);
-  let (countdownCounter, setCountdownCounter) = React.useState(() => 0);
-  let (state, setState) = React.useState(() => initialGlobalState);
-
-  let clearAllTimers = () => {
-    [
-      timers.tick,
-      timers.moveLeft,
-      timers.moveRight,
-      timers.rotate,
-      timers.countdown,
-    ]
-    ->(List.forEach(Utils.clearIntervalId));
-  };
-
-  let moveBlock = direction => {
-    setState(state =>
-      {
-        ...state,
-        gridState: Core.getGridStateAfterMove(direction, state.gridState),
-      }
-    );
-  };
-
-  let rotateBlock = () => {
-    setState(state =>
-      {...state, gridState: Core.getGridStateAfterRotate(state.gridState)}
-    );
-  };
-
-  let tick = () => {
-    setState(state => {
-      let next =
-        Core.tick(
-          state.gridState,
-          state.stats,
-          ~nextBlock=state.nextBlock,
-          (),
-        );
-
-      let {gridState, stats, gameOver, nextBlockToShow}: TickOutput.t = next;
-
-      if (gameOver) {
-        clearAllTimers();
-        setScreen(_ => Gameover);
-        {...state, gameOver: true};
-      } else {
-        let nextState = {
-          ...state,
-          nextBlock: nextBlockToShow,
-          gridState,
-          stats,
-        };
-
-        if (state.stats.level < next.stats.level) {
-          nextState;
-        } else {
-          nextState;
-        };
-      };
-    });
-  };
-
-  let updateTimer = (timerId, callback, delay) => {
-    Utils.clearIntervalId(timerId);
-    let newTimerId = Js.Global.setInterval(() => callback(), delay);
-    timerId := Some(newTimerId);
-  };
+  let ({countdownCounter, screen, gridState, nextBlock, stats}, send) =
+    ReludeReact.Reducer.useReducer(reducer, initGlobalState);
 
   let keyDownHandler = event => {
     let keyRepeated = Utils.Dom.isKeyRepeated(event);
@@ -112,16 +163,12 @@ let make = () => {
         Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
       switch (pressedButton) {
-      | ArrowLeft =>
-        updateTimer(timers.moveLeft, () => moveBlock(Left), Const.moveDelay)
-      | ArrowRight =>
-        updateTimer(
-          timers.moveRight,
-          () => moveBlock(Right),
-          Const.moveDelay,
-        )
-      | ArrowUp => updateTimer(timers.rotate, rotateBlock, Const.rotateDelay)
-      | ArrowDown => updateTimer(timers.tick, tick, Const.dropDelay)
+      | ArrowLeft => InitTimer(MoveLeft, Const.moveDelay)->send
+      | ArrowRight => InitTimer(MoveRight, Const.moveDelay)->send
+      | ArrowUp => InitTimer(Rotate, Const.rotateDelay)->send
+      | ArrowDown =>
+        ClearTimer(Tick)->send;
+        InitTimer(Tick, Const.dropDelay)->send;
       | Unsupported => ()
       };
     };
@@ -132,97 +179,75 @@ let make = () => {
       Utils.Dom.getKeyName(event)->KeyboardButton.fromString;
 
     switch (pressedButton) {
-    | ArrowLeft => Utils.clearIntervalId(timers.moveLeft)
-    | ArrowRight => Utils.clearIntervalId(timers.moveRight)
-    | ArrowUp => Utils.clearIntervalId(timers.rotate)
+    | ArrowLeft => ClearTimer(MoveLeft)->send
+    | ArrowRight => ClearTimer(MoveRight)->send
+    | ArrowUp => ClearTimer(Rotate)->send
     | ArrowDown =>
-      let delay = Core.calcDelay(state.stats.level);
-      updateTimer(timers.tick, tick, delay);
+      ClearTimer(Tick)->send;
+      ScheduleTick->send;
     | Unsupported => ()
     };
   };
 
-  let startGame = () => setScreen(_ => Core.nextScreen(screen));
+  let (keyUpHandler, _) = React.useState(_ => keyUpHandler);
+  let (keyDownHandler, _) = React.useState(_ => keyDownHandler);
 
-  React.useEffect(() => {
-    if (screen == Counter) {
-      if (countdownCounter > 0) {
-        let timerId =
-          Js.Global.setInterval(
-            () =>
-              setCountdownCounter(countdownCounter => countdownCounter - 1),
-            Const.countDelay,
-          );
-        timers.countdown := Some(timerId);
-      } else {
-        startGame();
-      };
-    } else {
-      ();
-    };
-
-    Some(() => Utils.clearIntervalId(timers.countdown));
-  });
-
-  //Use keyboard
   React.useEffect1(
-    () =>
-      if (screen == Game) {
+    () => {
+      switch (screen) {
+      | Game =>
         Utils.Dom.addKeyboardListeners(
           ~keyDownHandler,
           ~keyUpHandler,
           document,
         );
 
-        Some(
-          () =>
-            Utils.Dom.removeKeyboardListeners(
-              ~keyDownHandler,
-              ~keyUpHandler,
-              document,
-            ),
+        ScheduleTick->send;
+
+      | Gameover =>
+        Utils.Dom.removeKeyboardListeners(
+          ~keyDownHandler,
+          ~keyUpHandler,
+          document,
         );
-      } else {
-        None;
-      },
+
+        ClearTimer(Tick)->send;
+        ClearTimer(MoveLeft)->send;
+        ClearTimer(MoveRight)->send;
+        ClearTimer(Rotate)->send;
+      | _ => ()
+      };
+
+      None;
+    },
     [|screen|],
   );
 
-  let startCountdown = () => {
-    setState(_ => initialGlobalState);
-    setCountdownCounter(_ => 3);
-    setScreen(_ => Core.nextScreen(screen));
-  };
-
-  // Use Tick
-  React.useEffect2(
+  React.useEffect1(
     () => {
-      switch (screen) {
-      | Game =>
-        let delay = Core.calcDelay(state.stats.level);
-        updateTimer(timers.tick, tick, delay);
-      | _ => ()
+      if (stats.level > 1) {
+        ClearTimer(Tick)->send;
+        ScheduleTick->send;
       };
-      Some(() => Utils.clearIntervalId(timers.tick));
+
+      None;
     },
-    (screen, state.stats.level),
+    [|stats.level|],
   );
 
   let started = screen == Game || screen == Gameover;
 
   let gridToRender =
-    started ? Core.mapBlockToGrid(state.gridState) : initialGridState.grid;
+    started ? Core.mapBlockToGrid(gridState) : initialGridState.grid;
+
+  let onClickStart = () => send(StartCountdown);
 
   <div className=styles##game>
-    <NextBlock nextBlock={state.nextBlock} started />
+    {started &&& <NextBlock nextBlock />}
     <div className=styles##gridContainer>
       <Grid grid=gridToRender />
-      <GridOverlay
-        screen
-        countdownCounter
-        clickStart={_event => startCountdown()}
-      />
+      <GridOverlay screen countdownCounter onClickStart />
     </div>
-    <Stats stats={state.stats} started />
+    {started &&& <Stats stats />}
   </div>;
 };

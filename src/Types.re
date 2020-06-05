@@ -1,8 +1,10 @@
-type cell =
-  | O
-  | X;
+module Cell = {
+  type t =
+    | O
+    | X;
+};
 
-type row = array(cell);
+type row = array(Cell.t);
 
 type grid = array(row);
 
@@ -13,27 +15,33 @@ type blockPosition = {
   y: int,
 };
 
-type blockSize = {
-  width: int,
-  height: int,
-};
+module Timer = {
+  type t =
+    | Tick
+    | Countdown
+    | MoveLeft
+    | MoveRight
+    | Rotate;
 
-type nextBlock = block;
+  let every = [Tick, Countdown, MoveLeft, MoveRight, Rotate];
 
-type gameOver = bool;
+  module State = {
+    type t = {
+      tick: option(Js.Global.intervalId),
+      countdown: option(Js.Global.intervalId),
+      moveLeft: option(Js.Global.intervalId),
+      moveRight: option(Js.Global.intervalId),
+      rotate: option(Js.Global.intervalId),
+    };
 
-type intervalId = ref(option(Js.Global.intervalId));
-
-type countdownId = ref(option(Js.Global.intervalId));
-
-type countdownCounter = int;
-
-type timerIds = {
-  tick: intervalId,
-  countdown: intervalId,
-  moveLeft: intervalId,
-  moveRight: intervalId,
-  rotate: intervalId,
+    let empty = {
+      tick: None,
+      countdown: None,
+      moveLeft: None,
+      moveRight: None,
+      rotate: None,
+    };
+  };
 };
 
 module GridState = {
@@ -64,17 +72,19 @@ module TickOutput = {
   type t = {
     gridState: GridState.t,
     stats: GameStats.t,
-    gameOver,
+    gameOver: bool,
     nextBlockToShow: block,
   };
 };
 
 module GlobalState = {
   type t = {
+    screen: Screen.t,
+    countdownCounter: int,
+    stats: GameStats.t,
     gridState: GridState.t,
     nextBlock: block,
-    stats: GameStats.t,
-    gameOver,
+    timers: Timer.State.t,
   };
 };
 

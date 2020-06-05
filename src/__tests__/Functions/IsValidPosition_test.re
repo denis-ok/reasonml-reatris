@@ -1,6 +1,6 @@
 open Jest;
 open Expect;
-open Types;
+open Types.Cell;
 open Core
 
 let block = [|
