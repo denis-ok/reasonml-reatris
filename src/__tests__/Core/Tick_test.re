@@ -134,7 +134,7 @@ describe("Block placed, rows cleared, stats with level updated", () => {
 
   test("Score updated", () =>
     expect(result.stats)
-    |> toEqual(GameStats.{score: 501, lines: 1, level: 2})
+    |> toEqual(GameStats.{score: 511, lines: 1, level: 2})
   );
 });
 

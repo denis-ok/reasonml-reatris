@@ -149,16 +149,9 @@ let calcLevel = score => score / 500 + 1;
 let calcNextStats = (~stats: GameStats.t, ~strokesCount: int): GameStats.t => {
   let {score, lines, level}: GameStats.t = stats;
 
-  let strokesBonus =
-    switch (strokesCount) {
-    | 0 => 0
-    | 1 => 50
-    | 2 => 150
-    | 3 => 250
-    | _ => 350
-    };
+  let bonus = (50 + 10 * strokesCount) * strokesCount;
 
-  let newScore = score + strokesBonus + 1;
+  let newScore = score + 1 + bonus;
 
   {
     score: newScore,
