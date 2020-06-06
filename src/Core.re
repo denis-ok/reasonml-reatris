@@ -215,7 +215,7 @@ let tick =
   };
 };
 
-let getNextPositionByDirection = (direction: Direction.t, currentPosition) => {
+let nextBlockPosition = (direction: Direction.t, currentPosition) => {
   let {x, y} = currentPosition;
 
   let nextPosition =
@@ -231,7 +231,7 @@ let getGridStateAfterMove =
     (direction: Direction.t, gridState: GridState.t): GridState.t => {
   let {blockPosition, block, grid}: GridState.t = gridState;
 
-  let nextPosition = getNextPositionByDirection(direction, blockPosition);
+  let nextPosition = nextBlockPosition(direction, blockPosition);
 
   let canMap = canMapBlock(nextPosition, block, grid);
 
