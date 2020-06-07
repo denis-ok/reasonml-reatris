@@ -1,26 +1,19 @@
 start:
 	npm start
 
-reason-watch:
-	npm run reason-watch
-
 reason-build:
 	npm run reason-build
 
-reason-clean:
-	npm run reason-clean
+# disable implicit cleanup after each test for react-testing-library with RTL_SKIP_AUTO_CLEANUP=true
 
 test:
-	npm run jest
+	RTL_SKIP_AUTO_CLEANUP=true npm run jest
 
 test-watch:
-	npm run jest -- --watchAll
+	RTL_SKIP_AUTO_CLEANUP=true npm run jest -- --watchAll
 
 test-coverage:
-	npm run jest -- --coverage
-
-webpack-build-dev:
-	npm run webpack
+	RTL_SKIP_AUTO_CLEANUP=true npm run jest -- --coverage
 
 webpack-build-prod:
 	NODE_ENV=production npm run webpack

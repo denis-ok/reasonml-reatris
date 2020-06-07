@@ -1,6 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Game component Click Start 1`] = `
+exports[`Game component actions After 1 second 1`] = `
+<p
+  class="number"
+>
+  2
+</p>
+`;
+
+exports[`Game component actions After 2 seconds 1`] = `
+<p
+  class="number"
+>
+  1
+</p>
+`;
+
+exports[`Game component actions Click Start 1`] = `
 <p
   class="number"
 >
@@ -8,7 +24,13 @@ exports[`Game component Click Start 1`] = `
 </p>
 `;
 
-exports[`Game component Render game 1`] = `
+exports[`Game component actions Game started 1`] = `
+<p>
+  Score
+</p>
+`;
+
+exports[`Game component actions Render 1`] = `
 <div>
   <div
     class="game"
@@ -753,4 +775,10 @@ exports[`Game component Render game 1`] = `
     </div>
   </div>
 </div>
+`;
+
+exports[`Game component actions Start button 1`] = `
+<p>
+  Start Game
+</p>
 `;
