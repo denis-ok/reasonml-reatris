@@ -1,6 +1,9 @@
 open Jest;
 open Expect;
 open ReactTestingLibrary;
+open Belt;
+
+let getByString = text => getByText(~matcher=`Str(text), ~options=?None);
 
 // Auto cleanup after each test was intentionally disabled
 // Actually this is a one big test with set of sequental actions
@@ -8,7 +11,7 @@ open ReactTestingLibrary;
 
 beforeAll(() => Jest.useFakeTimers());
 
-describe("Game component actions", () => {
+describe("Game component", () => {
   let rendered = render(<Game />);
 
   let container = rendered |> container;
@@ -17,43 +20,56 @@ describe("Game component actions", () => {
     expect(container) |> toMatchSnapshot
   });
 
-  let startButton =
-    rendered |> getByText(~matcher=`Str("Start Game"), ~options=?None);
+  let startButton = rendered |> getByString("Start Game");
 
-  test("Start button", () => {
+  test("Render Start button", () => {
     expect(startButton) |> toMatchSnapshot
   });
 
-  test("Click Start", () => {
+  test("Number 3 Displayed after click Start", () => {
     act(() => startButton |> FireEvent.click(~eventInit=?None));
 
-    let numberThree =
-      rendered |> getByText(~matcher=`Str("3"), ~options=?None);
+    let numberThree = rendered |> getByString("3");
 
     expect(numberThree) |> toMatchSnapshot;
   });
 
-  test("After 1 second", () => {
+  test("Number 2 Displayed after 1 second", () => {
     act(() => Jest.advanceTimersByTime(1000));
 
-    let numberTwo =
-      rendered |> getByText(~matcher=`Str("2"), ~options=?None);
+    let numberTwo = rendered |> getByString("2");
 
     expect(numberTwo) |> toMatchSnapshot;
   });
 
-  test("After 2 seconds", () => {
+  test("Number 1 Displayed after 2 seconds", () => {
     act(() => Jest.advanceTimersByTime(1000));
-    let three = rendered |> getByText(~matcher=`Str("1"), ~options=?None);
-    expect(three) |> toMatchSnapshot;
+
+    let numberThree = rendered |> getByString("1");
+
+    expect(numberThree) |> toMatchSnapshot;
   });
 
-  test("Game started", () => {
+  test("Game started, Score displayed", () => {
     act(() => Jest.advanceTimersByTime(1000));
 
-    let scoreText =
-      rendered |> getByText(~matcher=`Str("Score"), ~options=?None);
+    let scoreText = rendered |> getByString("Score");
 
     expect(scoreText) |> toMatchSnapshot;
+  });
+
+  test("Render Play Again button", () => {
+    act(() => Array.make(150, 500)->Array.forEach(Jest.advanceTimersByTime));
+
+    let gameOverText = rendered |> getByString("Play Again?");
+    expect(gameOverText) |> toMatchSnapshot;
+  });
+
+  test("Click on 'Play Again' shows countdown counter", () => {
+    let playAgainButton = rendered |> getByString("Play Again?");
+    act(() => playAgainButton |> FireEvent.click(~eventInit=?None));
+
+    let numberThree = rendered |> getByString("3");
+    expect(numberThree) |> toMatchSnapshot;
   });
 });
