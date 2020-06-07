@@ -1,6 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Game component render 1`] = `
+exports[`Game component Click Start 1`] = `
+<p
+  class="number"
+>
+  3
+</p>
+`;
+
+exports[`Game component Render game 1`] = `
 <div>
   <div
     class="game"

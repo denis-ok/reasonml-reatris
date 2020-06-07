@@ -3,11 +3,23 @@ open Expect;
 open ReactTestingLibrary;
 
 describe("Game component", () => {
-  let rendered = render(<Game />);
+  test("Render game", () => {
+    let rendered = render(<Game />);
 
-  let container = rendered |> container;
+    let container = rendered |> container;
+    expect(container) |> toMatchSnapshot;
+  });
 
-  test("render", () => {
-    expect(container) |> toMatchSnapshot
+  test("Click Start", () => {
+    let rendered = render(<Game />);
+
+    let button =
+      rendered |> getByText(~matcher=`Str("Start Game"), ~options=?None);
+
+    button |> FireEvent.click(~eventInit=?None);
+
+    let counter = rendered |> getByText(~matcher=`Str("3"), ~options=?None);
+
+    expect(counter) |> toMatchSnapshot;
   });
 });
