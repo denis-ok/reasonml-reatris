@@ -21,7 +21,12 @@
     "relude",
     "relude-reason-react"
   ],
-  "bs-dev-dependencies": ["@glennsl/bs-jest", "bs-react-testing-library"],
+  "bs-dev-dependencies": [
+    "@glennsl/bs-jest",
+    "bs-react-testing-library",
+    "bisect_ppx"
+  ],
+  "ppx-flags": [["bisect_ppx/ppx", "--exclude-files", ".*_test\\.re$$"]],
   "warnings": {
     "error": "+101"
   },

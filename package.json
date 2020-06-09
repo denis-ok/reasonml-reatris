@@ -23,6 +23,7 @@
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "@glennsl/bs-jest": "^0.5.1",
+    "bisect_ppx": "^2.4.1",
     "bs-platform": "^7.3.2",
     "bs-react-testing-library": "^0.7.2",
     "bs-webapi": "^0.15.9",

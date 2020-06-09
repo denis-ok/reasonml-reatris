@@ -1,6 +1,5 @@
 module.exports = {
   testEnvironment: "jsdom",
-  // testURL: "http://localhost/",
   verbose: true,
   testRegex: "\\_test\\.bs\\.js$",
   transform: {
@@ -16,4 +15,5 @@ module.exports = {
   moduleNameMapper: {
     "\\.(css)$": "identity-obj-proxy",
   },
+  setupFilesAfterEnv: ["bisect_ppx/src/runtime/bucklescript/jest.js"],
 };
