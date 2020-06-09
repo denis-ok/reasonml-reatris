@@ -20,8 +20,8 @@
   "author": "Denis Strelkov",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
     "@glennsl/bs-jest": "^0.5.1",
     "bs-platform": "^7.3.2",
     "bs-react-testing-library": "^0.7.2",
