@@ -149,16 +149,9 @@ let calcLevel = score => score / 500 + 1;
 let calcNextStats = (~stats: GameStats.t, ~strokesCount: int): GameStats.t => {
   let {score, lines, level}: GameStats.t = stats;
 
-  let strokesBonus =
-    switch (strokesCount) {
-    | 0 => 0
-    | 1 => 50
-    | 2 => 150
-    | 3 => 250
-    | _ => 350
-    };
+  let bonus = (50 + 10 * strokesCount) * strokesCount;
 
-  let newScore = score + strokesBonus + 1;
+  let newScore = score + 1 + bonus;
 
   {
     score: newScore,
@@ -222,7 +215,7 @@ let tick =
   };
 };
 
-let getNextPositionByDirection = (direction: Direction.t, currentPosition) => {
+let nextBlockPosition = (direction: Direction.t, currentPosition) => {
   let {x, y} = currentPosition;
 
   let nextPosition =
@@ -238,7 +231,7 @@ let getGridStateAfterMove =
     (direction: Direction.t, gridState: GridState.t): GridState.t => {
   let {blockPosition, block, grid}: GridState.t = gridState;
 
-  let nextPosition = getNextPositionByDirection(direction, blockPosition);
+  let nextPosition = nextBlockPosition(direction, blockPosition);
 
   let canMap = canMapBlock(nextPosition, block, grid);
 

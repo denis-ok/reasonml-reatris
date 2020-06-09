@@ -1,6 +1,6 @@
 name: Node.js CI
 
-on: [push]
+on: ["push", "pull_request"]
 
 jobs:
   build:
@@ -24,4 +24,9 @@ jobs:
       run: NODE_ENV=production npm run webpack
 
     - name: Test
-      run: npm run jest
+      run: make test-coverage
+
+    - name: Coveralls GitHub Action
+      uses: coverallsapp/github-action@v1.1.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
